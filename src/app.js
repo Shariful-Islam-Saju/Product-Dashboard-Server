@@ -9,11 +9,24 @@ import authRouter from "./routes/auth.js";
 const app = express();
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: process.env.CLIENT_URI, // frontend origin
+  credentials: true, // allow cookies
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
+// Log Request 
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+
 // Health check route
+
 app.get("/", (req, res) => {
   res.status(200).json({ message: "✅ Product Dashboard API is running." });
 });

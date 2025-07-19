@@ -56,7 +56,7 @@ export const loginUser = async (req, res) => {
       user: safeUser,
     });
   } catch (error) {
-    console.error("❌ Login error:", error);
+    console.error(" Login error:", error);
     res.status(500).json({ message: " Internal server error" });
   }
 };
