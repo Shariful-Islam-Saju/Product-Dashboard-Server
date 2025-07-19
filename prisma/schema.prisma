@@ -1,0 +1,1838 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model ac_accounts {
+  id                                                               Int                @id @default(autoincrement())
+  count_id                                                         Int?
+  store_id                                                         Int?
+  parent_id                                                        Int?
+  sort_code                                                        String?            @db.VarChar(100)
+  account_name                                                     String?            @db.VarChar(50)
+  account_code                                                     String?            @db.VarChar(50)
+  balance                                                          Float?
+  note                                                             String?            @db.Text
+  created_by                                                       String?            @db.VarChar(50)
+  created_date                                                     DateTime?          @db.Date
+  created_time                                                     String?            @db.VarChar(50)
+  system_ip                                                        String?            @db.VarChar(50)
+  system_name                                                      String?            @db.VarChar(50)
+  status                                                           Int?
+  delete_bit                                                       Int?               @default(0)
+  account_selection_name                                           String?            @db.VarChar(50)
+  paymenttypes_id                                                  Int?
+  customer_id                                                      Int?
+  supplier_id                                                      Int?
+  expense_id                                                       Int?
+  db_store                                                         db_store?          @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "ac_accounts_ibfk_1")
+  db_paymenttypes                                                  db_paymenttypes?   @relation(fields: [paymenttypes_id], references: [id], onDelete: Cascade, map: "ac_accounts_ibfk_2")
+  db_customers                                                     db_customers?      @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "ac_accounts_ibfk_3")
+  db_suppliers                                                     db_suppliers?      @relation(fields: [supplier_id], references: [id], onDelete: Cascade, map: "ac_accounts_ibfk_4")
+  db_expense_ac_accounts_expense_idTodb_expense                    db_expense?        @relation("ac_accounts_expense_idTodb_expense", fields: [expense_id], references: [id], onDelete: Cascade, map: "ac_accounts_ibfk_5")
+  ac_moneydeposits_ac_moneydeposits_debit_account_idToac_accounts  ac_moneydeposits[] @relation("ac_moneydeposits_debit_account_idToac_accounts")
+  ac_moneydeposits_ac_moneydeposits_credit_account_idToac_accounts ac_moneydeposits[] @relation("ac_moneydeposits_credit_account_idToac_accounts")
+  ac_moneytransfer_ac_moneytransfer_debit_account_idToac_accounts  ac_moneytransfer[] @relation("ac_moneytransfer_debit_account_idToac_accounts")
+  ac_moneytransfer_ac_moneytransfer_credit_account_idToac_accounts ac_moneytransfer[] @relation("ac_moneytransfer_credit_account_idToac_accounts")
+  ac_transactions                                                  ac_transactions[]
+  db_expense_db_expense_account_idToac_accounts                    db_expense[]       @relation("db_expense_account_idToac_accounts")
+
+  @@index([customer_id], map: "customer_id")
+  @@index([expense_id], map: "expense_id")
+  @@index([paymenttypes_id], map: "paymenttypes_id")
+  @@index([store_id], map: "store_id")
+  @@index([supplier_id], map: "supplier_id")
+}
+
+model ac_moneydeposits {
+  id                                                          Int               @id @default(autoincrement())
+  store_id                                                    Int?
+  deposit_date                                                DateTime?         @db.Date
+  reference_no                                                String?           @db.VarChar(50)
+  debit_account_id                                            Int?
+  credit_account_id                                           Int?
+  amount                                                      Float?
+  note                                                        String?           @db.Text
+  created_by                                                  String?           @db.VarChar(50)
+  created_date                                                String?           @db.VarChar(50)
+  created_time                                                String?           @db.VarChar(50)
+  system_ip                                                   String?           @db.VarChar(50)
+  system_name                                                 String?           @db.VarChar(50)
+  status                                                      Int?
+  ac_accounts_ac_moneydeposits_debit_account_idToac_accounts  ac_accounts?      @relation("ac_moneydeposits_debit_account_idToac_accounts", fields: [debit_account_id], references: [id], onDelete: Cascade, map: "ac_moneydeposits_ibfk_1")
+  ac_accounts_ac_moneydeposits_credit_account_idToac_accounts ac_accounts?      @relation("ac_moneydeposits_credit_account_idToac_accounts", fields: [credit_account_id], references: [id], onDelete: Cascade, map: "ac_moneydeposits_ibfk_2")
+  db_store                                                    db_store?         @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "ac_moneydeposits_ibfk_3")
+  ac_transactions                                             ac_transactions[]
+
+  @@index([store_id], map: "db_moneydeposits_ibfk_3")
+  @@index([debit_account_id], map: "from_account_id")
+  @@index([credit_account_id], map: "to_account_id")
+}
+
+model ac_moneytransfer {
+  id                                                          Int               @id @default(autoincrement())
+  store_id                                                    Int?
+  count_id                                                    Int?
+  transfer_code                                               String?           @db.VarChar(50)
+  transfer_date                                               DateTime?         @db.Date
+  reference_no                                                String?           @db.VarChar(50)
+  debit_account_id                                            Int?
+  credit_account_id                                           Int?
+  amount                                                      Float?
+  note                                                        String?           @db.Text
+  created_by                                                  String?           @db.VarChar(50)
+  created_date                                                String?           @db.VarChar(50)
+  created_time                                                String?           @db.VarChar(50)
+  system_ip                                                   String?           @db.VarChar(50)
+  system_name                                                 String?           @db.VarChar(50)
+  status                                                      Int?
+  ac_accounts_ac_moneytransfer_debit_account_idToac_accounts  ac_accounts?      @relation("ac_moneytransfer_debit_account_idToac_accounts", fields: [debit_account_id], references: [id], onDelete: Cascade, map: "ac_moneytransfer_ibfk_1")
+  ac_accounts_ac_moneytransfer_credit_account_idToac_accounts ac_accounts?      @relation("ac_moneytransfer_credit_account_idToac_accounts", fields: [credit_account_id], references: [id], onDelete: Cascade, map: "ac_moneytransfer_ibfk_2")
+  db_store                                                    db_store?         @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "ac_moneytransfer_ibfk_3")
+  ac_transactions                                             ac_transactions[]
+
+  @@index([store_id], map: "db_moneytransfer_ibfk_3")
+  @@index([debit_account_id], map: "from_account_id")
+  @@index([credit_account_id], map: "to_account_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ac_transactions {
+  id                            Int                        @id @default(autoincrement())
+  store_id                      Int?
+  payment_code                  String?                    @db.VarChar(50)
+  transaction_date              DateTime?                  @db.Date
+  transaction_type              String?                    @db.VarChar(100)
+  debit_account_id              Int?
+  credit_account_id             Int?
+  debit_amt                     Float?
+  credit_amt                    Float?
+  note                          String?                    @db.Text
+  created_by                    String?                    @db.VarChar(50)
+  created_date                  DateTime?                  @db.Date
+  ref_accounts_id               Int?
+  ref_moneytransfer_id          Int?
+  ref_moneydeposits_id          Int?
+  ref_salespayments_id          Int?
+  ref_salespaymentsreturn_id    Int?
+  ref_purchasepayments_id       Int?
+  ref_purchasepaymentsreturn_id Int?
+  ref_expense_id                Int?
+  customer_id                   Int?
+  supplier_id                   Int?
+  short_code                    String?                    @db.VarChar(50)
+  db_purchasepayments           db_purchasepayments?       @relation(fields: [ref_purchasepayments_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_10")
+  db_purchasepaymentsreturn     db_purchasepaymentsreturn? @relation(fields: [ref_purchasepaymentsreturn_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_11")
+  db_suppliers                  db_suppliers?              @relation(fields: [supplier_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_12")
+  db_expense                    db_expense?                @relation(fields: [ref_expense_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_13")
+  db_store                      db_store?                  @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_3")
+  ac_accounts                   ac_accounts?               @relation(fields: [ref_accounts_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_4")
+  ac_moneytransfer              ac_moneytransfer?          @relation(fields: [ref_moneytransfer_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_5")
+  ac_moneydeposits              ac_moneydeposits?          @relation(fields: [ref_moneydeposits_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_6")
+  db_customers                  db_customers?              @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_7")
+  db_salespayments              db_salespayments?          @relation(fields: [ref_salespayments_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_8")
+  db_salespaymentsreturn        db_salespaymentsreturn?    @relation(fields: [ref_salespaymentsreturn_id], references: [id], onDelete: Cascade, map: "ac_transactions_ibfk_9")
+
+  @@index([ref_accounts_id], map: "ac_accounts_id")
+  @@index([ref_moneydeposits_id], map: "ac_moneydeposits_id")
+  @@index([ref_moneytransfer_id], map: "ac_moneytransfer_id")
+  @@index([ref_salespaymentsreturn_id], map: "ac_transactions_ibfk_9")
+  @@index([debit_account_id], map: "account_id")
+  @@index([customer_id], map: "customer_id")
+  @@index([transaction_type], map: "journal_id")
+  @@index([ref_expense_id], map: "ref_expense_id")
+  @@index([ref_purchasepayments_id], map: "ref_purchasepayments_id")
+  @@index([ref_purchasepaymentsreturn_id], map: "ref_purchasepaymentsreturn_id")
+  @@index([ref_salespayments_id], map: "ref_salespayments_id")
+  @@index([store_id], map: "store_id")
+  @@index([supplier_id], map: "supplier_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ci_sessions {
+  id         String @db.VarChar(128)
+  ip_address String @db.VarChar(45)
+  timestamp  Int    @default(0) @db.UnsignedInt
+  data       Bytes  @db.Blob
+
+  @@index([timestamp], map: "ci_sessions_timestamp")
+  @@ignore
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_bankdetails {
+  id             Int       @id @default(autoincrement())
+  store_id       Int?
+  country_id     Int?
+  holder_name    String?   @db.VarChar(250)
+  bank_name      String?   @db.VarChar(250)
+  branch_name    String?   @db.VarChar(250)
+  code           String?   @db.VarChar(250)
+  account_type   String?   @db.VarChar(250)
+  account_number String?   @db.VarChar(250)
+  other_details  String?   @db.MediumText
+  description    String?   @db.MediumText
+  status         Int?
+  db_store       db_store? @relation(fields: [store_id], references: [id], onDelete: Restrict, map: "db_bankdetails_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_brands {
+  id          Int       @id @default(autoincrement())
+  store_id    Int?
+  brand_code  String?   @db.VarChar(50)
+  brand_name  String?   @db.VarChar(100)
+  description String?   @db.MediumText
+  status      Int?
+  db_store    db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_brands_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_category {
+  id            Int       @id @default(autoincrement())
+  store_id      Int?
+  count_id      Int?
+  category_code String?   @db.VarChar(50)
+  category_name String?   @db.VarChar(100)
+  description   String?   @db.MediumText
+  company_id    Int?
+  status        Int?
+  db_store      db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_category_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_cobpayments {
+  id           Int       @id @default(autoincrement())
+  customer_id  Int?
+  payment_date DateTime? @db.Date
+  payment_type String?   @db.VarChar(50)
+  payment      Float?
+  payment_note String?   @db.MediumText
+  system_ip    String?   @db.VarChar(50)
+  system_name  String?   @db.VarChar(50)
+  created_time DateTime? @db.Time(0)
+  created_date DateTime? @db.Date
+  created_by   String?   @db.VarChar(50)
+  status       Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_company {
+  id                         Float?
+  company_code               String? @db.VarChar(150)
+  company_name               String? @db.VarChar(150)
+  company_website            String? @db.VarChar(150)
+  mobile                     String? @db.VarChar(150)
+  phone                      String? @db.VarChar(150)
+  email                      String? @db.VarChar(100)
+  website                    String? @db.VarChar(250)
+  company_logo               String? @db.Text
+  logo                       String? @db.MediumText
+  upi_id                     String? @db.VarChar(50)
+  upi_code                   String? @db.Text
+  country                    String? @db.VarChar(150)
+  state                      String? @db.VarChar(150)
+  city                       String? @db.VarChar(100)
+  address                    String? @db.VarChar(300)
+  postcode                   String? @db.VarChar(50)
+  gst_no                     String? @db.VarChar(50)
+  vat_no                     String? @db.VarChar(50)
+  pan_no                     String? @db.VarChar(50)
+  bank_details               String? @db.MediumText
+  cid                        Int?
+  category_init              String? @db.VarChar(5)
+  item_init                  String? @db.VarChar(5)
+  supplier_init              String? @db.VarChar(5)
+  purchase_init              String? @db.VarChar(5)
+  purchase_return_init       String? @db.VarChar(5)
+  customer_init              String? @db.VarChar(5)
+  sales_init                 String? @db.VarChar(5)
+  sales_return_init          String? @db.VarChar(5)
+  expense_init               String? @db.VarChar(5)
+  invoice_view               Int?
+  status                     Int?
+  sms_status                 Int?
+  sales_terms_and_conditions String? @db.Text
+
+  @@ignore
+}
+
+model db_country {
+  id       Int       @id @default(autoincrement())
+  country  String?   @db.VarChar(4050)
+  added_on DateTime? @db.Date
+  status   Int?
+}
+
+model db_coupons {
+  id                  Int                   @id @default(autoincrement())
+  store_id            Int?
+  code                String?               @db.VarChar(50)
+  name                String?               @db.VarChar(100)
+  description         String?               @db.Text
+  value               Float?
+  type                String?               @db.VarChar(50)
+  expire_date         DateTime?             @db.Date
+  status              Int?
+  created_by          String?               @db.VarChar(100)
+  created_date        DateTime?             @db.Date
+  created_time        String?               @db.VarChar(100)
+  system_name         String?               @db.VarChar(250)
+  system_ip           String?               @db.VarChar(250)
+  db_store            db_store?             @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_coupons_ibfk_1")
+  db_customer_coupons db_customer_coupons[]
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_currency {
+  id            Int     @id @default(autoincrement())
+  currency_name String? @db.VarChar(50)
+  currency_code String? @db.VarChar(20)
+  currency      Bytes?  @db.Blob
+  symbol        String? @db.MediumText
+  status        Int?
+}
+
+model db_custadvance {
+  id           Int           @id @default(autoincrement())
+  store_id     Int?
+  count_id     Int?
+  payment_code String?       @db.VarChar(50)
+  payment_date DateTime?     @db.Date
+  customer_id  Int?
+  amount       Float?
+  payment_type String?       @db.VarChar(100)
+  note         String?       @db.Text
+  created_by   String?       @db.VarChar(50)
+  created_date DateTime?     @db.Date
+  created_time String?       @db.VarChar(50)
+  system_ip    String?       @db.VarChar(250)
+  system_name  String?       @db.VarChar(250)
+  status       Int?
+  db_customers db_customers? @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_custadvance_ibfk_1")
+  db_store     db_store?     @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_custadvance_ibfk_2")
+
+  @@index([customer_id], map: "customer_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_customer_coupons {
+  id             Int              @id @default(autoincrement())
+  store_id       Int?
+  code           String?          @db.VarChar(50)
+  name           String?          @db.VarChar(100)
+  description    String?          @db.Text
+  value          Float?
+  type           String?          @db.VarChar(50)
+  expire_date    DateTime?        @db.Date
+  status         Int?
+  created_by     String?          @db.VarChar(100)
+  created_date   DateTime?        @db.Date
+  created_time   String?          @db.VarChar(100)
+  system_name    String?          @db.VarChar(250)
+  system_ip      String?          @db.VarChar(250)
+  customer_id    Int?
+  coupon_id      Int?
+  db_store       db_store?        @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_customer_coupons_ibfk_1")
+  db_customers   db_customers?    @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_customer_coupons_ibfk_3")
+  db_coupons     db_coupons?      @relation(fields: [coupon_id], references: [id], onDelete: Cascade, map: "db_customer_coupons_ibfk_4")
+  db_sales       db_sales[]
+  db_salesreturn db_salesreturn[]
+
+  @@index([coupon_id], map: "coupon_id")
+  @@index([customer_id], map: "customer_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_customer_payments {
+  id               Int               @id @default(autoincrement())
+  salespayment_id  Int?
+  customer_id      Int?
+  payment_date     DateTime?         @db.Date
+  payment_type     String?           @db.VarChar(50)
+  payment          Float?
+  payment_note     String?           @db.Text
+  system_ip        String?           @db.VarChar(50)
+  system_name      String?           @db.VarChar(50)
+  created_time     String?           @db.VarChar(50)
+  created_date     String?           @db.VarChar(50)
+  created_by       String?           @db.VarChar(50)
+  status           Int?
+  db_customers     db_customers?     @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_customer_payments_ibfk_1")
+  db_salespayments db_salespayments? @relation(fields: [salespayment_id], references: [id], onDelete: Cascade, map: "db_customer_payments_ibfk_2")
+
+  @@index([customer_id], map: "customer_id")
+  @@index([salespayment_id], map: "salespayment_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_customers {
+  id                     Int                      @id @default(autoincrement())
+  store_id               Int?
+  count_id               Int?
+  customer_code          String?                  @db.VarChar(20)
+  customer_name          String?                  @db.VarChar(50)
+  mobile                 String?                  @db.VarChar(15)
+  phone                  String?                  @db.VarChar(15)
+  email                  String?                  @db.VarChar(50)
+  gstin                  String?                  @db.VarChar(100)
+  tax_number             String?                  @db.VarChar(50)
+  vatin                  String?                  @db.VarChar(100)
+  opening_balance        Float?
+  sales_due              Float?
+  sales_return_due       Float?
+  country_id             Int?
+  state_id               Int?
+  city                   String?                  @db.VarChar(50)
+  postcode               String?                  @db.VarChar(10)
+  address                String?                  @db.VarChar(250)
+  ship_country_id        Int?
+  ship_state_id          Int?
+  ship_city              String?                  @db.VarChar(100)
+  ship_postcode          String?                  @db.VarChar(10)
+  ship_address           String?                  @db.Text
+  system_ip              String?                  @db.VarChar(50)
+  system_name            String?                  @db.VarChar(50)
+  created_date           DateTime?                @db.Date
+  created_time           String?                  @db.VarChar(30)
+  created_by             String?                  @db.VarChar(50)
+  company_id             Int?
+  status                 Int?
+  location_link          String?                  @db.Text
+  attachment_1           String?                  @db.Text
+  price_level_type       String?                  @default("Increase") @db.VarChar(50)
+  price_level            Float?                   @default(0.0000)
+  delete_bit             Int?                     @default(0)
+  tot_advance            Float?
+  credit_limit           Float?                   @default(-1.0000)
+  shippingaddress_id     Int?
+  ac_accounts            ac_accounts[]
+  ac_transactions        ac_transactions[]
+  db_custadvance         db_custadvance[]
+  db_customer_coupons    db_customer_coupons[]
+  db_customer_payments   db_customer_payments[]
+  db_store               db_store?                @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_customers_ibfk_1")
+  db_hold                db_hold[]
+  db_quotation           db_quotation[]
+  db_sales               db_sales[]
+  db_salespayments       db_salespayments[]
+  db_salespaymentsreturn db_salespaymentsreturn[]
+  db_shippingaddress     db_shippingaddress[]     @ignore
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_emailtemplates {
+  id            Int       @id @default(autoincrement())
+  store_id      Int?
+  key           String?   @db.VarChar(150)
+  template_name String?   @db.VarChar(100)
+  content       String?   @db.Text
+  variables     String?   @db.Text
+  status        Int?
+  undelete_bit  Int?
+  admin_only    Int?      @default(0)
+  db_store      db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_emailtemplates_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_expense {
+  id                                             Int               @id @default(autoincrement())
+  store_id                                       Int?
+  count_id                                       Int?
+  expense_code                                   String?           @db.VarChar(50)
+  category_id                                    Int?
+  expense_date                                   DateTime?         @db.Date
+  reference_no                                   String?           @db.VarChar(50)
+  expense_for                                    String?           @db.VarChar(100)
+  expense_amt                                    Float?
+  payment_type                                   String?           @db.VarChar(100)
+  account_id                                     Int?
+  note                                           String?           @db.Text
+  created_by                                     String?           @db.VarChar(50)
+  created_date                                   DateTime?         @db.Date
+  created_time                                   String?           @db.VarChar(50)
+  system_ip                                      String?           @db.VarChar(50)
+  system_name                                    String?           @db.VarChar(50)
+  status                                         Int?
+  ac_accounts_ac_accounts_expense_idTodb_expense ac_accounts[]     @relation("ac_accounts_expense_idTodb_expense")
+  ac_transactions                                ac_transactions[]
+  db_store                                       db_store?         @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_expense_ibfk_1")
+  ac_accounts_db_expense_account_idToac_accounts ac_accounts?      @relation("db_expense_account_idToac_accounts", fields: [account_id], references: [id], onDelete: Cascade, map: "db_expense_ibfk_2")
+
+  @@index([account_id], map: "account_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_expense_category {
+  id            Int       @id @default(autoincrement())
+  store_id      Int?
+  category_code String?   @db.VarChar(50)
+  category_name String?   @db.VarChar(50)
+  description   String?   @db.MediumText
+  created_by    String?   @db.VarChar(50)
+  status        Int?
+  db_store      db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_expense_category_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_fivemojo {
+  id          Int       @id @default(autoincrement())
+  store_id    Int?
+  url         String?   @db.Text
+  token       String?   @db.Text
+  instance_id String?   @db.Text
+  status      Int?      @default(0)
+  db_store    db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_fivemojo_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_hold {
+  id                      Int            @id @default(autoincrement())
+  store_id                Int?
+  warehouse_id            Int?
+  reference_id            String?        @db.VarChar(50)
+  reference_no            String?        @db.VarChar(50)
+  sales_date              DateTime?      @db.Date
+  sales_status            String?        @db.VarChar(50)
+  customer_id             Int?
+  other_charges_input     Float?
+  other_charges_tax_id    Int?
+  other_charges_amt       Float?
+  discount_to_all_input   Float?
+  discount_to_all_type    String?        @db.VarChar(50)
+  tot_discount_to_all_amt Float?
+  subtotal                Float?
+  round_off               Float?
+  grand_total             Float?
+  sales_note              String?        @db.Text
+  pos                     Int?
+  db_store                db_store?      @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_hold_ibfk_1")
+  db_customers            db_customers?  @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_hold_ibfk_2")
+  db_warehouse            db_warehouse?  @relation(fields: [warehouse_id], references: [id], onDelete: Cascade, map: "db_hold_ibfk_3")
+  db_holditems            db_holditems[]
+
+  @@index([customer_id], map: "customer_id")
+  @@index([store_id], map: "store_id")
+  @@index([warehouse_id], map: "warehouse_id")
+}
+
+model db_holditems {
+  id              Int       @id @default(autoincrement())
+  store_id        Int?
+  hold_id         Int?
+  item_id         Int?
+  description     String?   @db.Text
+  sales_qty       Float?
+  price_per_unit  Float?
+  tax_type        String?   @db.VarChar(50)
+  tax_id          Int?
+  tax_amt         Float?
+  discount_type   String?   @db.VarChar(50)
+  discount_input  Float?
+  discount_amt    Float?
+  unit_total_cost Float?
+  total_cost      Float?
+  db_store        db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_holditems_ibfk_1")
+  db_hold         db_hold?  @relation(fields: [hold_id], references: [id], onDelete: Cascade, map: "db_holditems_ibfk_2")
+  db_items        db_items? @relation(fields: [item_id], references: [id], onDelete: Cascade, map: "db_holditems_ibfk_3")
+
+  @@index([item_id], map: "item_id")
+  @@index([hold_id], map: "sales_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_instamojo {
+  id         Int       @id @default(autoincrement())
+  store_id   Int?
+  sandbox    Int?
+  api_key    String?   @db.Text
+  api_token  String?   @db.Text
+  updated_at DateTime? @db.Date
+  updated_by String?   @db.VarChar(50)
+  status     Int?
+  db_store   db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_instamojo_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_instamojopayments {
+  id                      Int     @id @default(autoincrement()) @db.UnsignedInt
+  phone                   String? @db.VarChar(25)
+  email                   String? @db.VarChar(255)
+  buyer_name              String? @db.VarChar(255)
+  amount                  Decimal @db.Decimal(16, 2)
+  purpose                 String? @db.Text
+  expires_at              String? @db.VarChar(255)
+  status                  String? @db.VarChar(255)
+  send_sms                String  @default("false") @db.VarChar(5)
+  send_email              String  @default("false") @db.VarChar(5)
+  sms_status              String? @db.VarChar(255)
+  email_status            String? @db.VarChar(255)
+  shorturl                String? @db.MediumText
+  longurl                 String? @db.MediumText
+  redirect_url            String? @db.MediumText
+  webhook                 String? @db.MediumText
+  allow_repeated_payments String  @default("false") @db.VarChar(5)
+  customer_id             String? @db.VarChar(255)
+  created_at              String? @db.VarChar(255)
+  modified_at             String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_items {
+  id                      Int                       @id @default(autoincrement())
+  store_id                Int?
+  count_id                Int?
+  item_code               String?                   @db.VarChar(50)
+  item_name               String?                   @db.VarChar(100)
+  category_id             Int?
+  sku                     String?                   @db.VarChar(50)
+  hsn                     String?                   @db.VarChar(50)
+  sac                     String?                   @db.VarChar(50)
+  unit_id                 Int?
+  alert_qty               Int?
+  brand_id                Int?
+  lot_number              String?                   @db.VarChar(50)
+  expire_date             DateTime?                 @db.Date
+  price                   Float?
+  tax_id                  Int?
+  purchase_price          Float?
+  tax_type                String?                   @db.VarChar(50)
+  profit_margin           Float?
+  sales_price             Float?
+  stock                   Float?
+  item_image              String?                   @db.Text
+  system_ip               String?                   @db.VarChar(50)
+  system_name             String?                   @db.VarChar(50)
+  created_date            DateTime?                 @db.Date
+  created_time            String?                   @db.VarChar(50)
+  created_by              String?                   @db.VarChar(50)
+  company_id              Int?
+  status                  Int?
+  discount_type           String?                   @default("Percentage") @db.VarChar(100)
+  discount                Float?                    @default(0.00)
+  service_bit             Int?                      @default(0)
+  seller_points           Float?                    @default(0.00)
+  custom_barcode          String?                   @db.VarChar(100)
+  description             String?                   @db.Text
+  item_group              String?                   @db.VarChar(50)
+  parent_id               Int?
+  variant_id              Int?
+  child_bit               Int?                      @default(0)
+  mrp                     Float?
+  db_holditems            db_holditems[]
+  db_store                db_store?                 @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_items_ibfk_1")
+  db_stockadjustmentitems db_stockadjustmentitems[]
+  db_stocktransferitems   db_stocktransferitems[]
+  db_warehouseitems       db_warehouseitems[]
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_languages {
+  id       Int     @id @default(autoincrement())
+  language String? @db.VarChar(50)
+  status   Int?
+}
+
+model db_package {
+  id             Int       @id @default(autoincrement())
+  store_id       Int?
+  package_type   String?   @db.VarChar(50)
+  package_code   String?   @db.VarChar(20)
+  package_name   String?   @db.VarChar(50)
+  description    String?   @db.Text
+  monthly_price  Float?
+  annual_price   Float?
+  trial_days     Int?
+  max_users      Int?
+  max_items      Int?
+  max_invoices   Int?
+  max_warehouses Int?
+  expire_date    DateTime? @db.Date
+  system_ip      String?   @db.VarChar(50)
+  system_name    String?   @db.VarChar(50)
+  created_date   DateTime? @db.Date
+  created_time   String?   @db.VarChar(30)
+  created_by     String?   @db.VarChar(50)
+  status         Int?
+  plan_type      String?   @db.VarChar(100)
+  db_store       db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_package_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_paymenttypes {
+  id           Int           @id @default(autoincrement())
+  store_id     Int?
+  payment_type String?       @db.VarChar(50)
+  status       Int?
+  ac_accounts  ac_accounts[]
+  db_store     db_store?     @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_paymenttypes_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_paypal {
+  id         Int       @id @default(autoincrement())
+  store_id   Int?
+  sandbox    Int?
+  email      String?   @db.VarChar(100)
+  updated_at DateTime? @db.Date
+  updated_by String?   @db.VarChar(50)
+  status     Int?
+  db_store   db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_paypal_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_paypalpaylog {
+  payment_id     Int    @id @default(autoincrement())
+  user_id        Int
+  product_id     Int
+  txn_id         String @db.VarChar(255)
+  payment_gross  Float  @db.Float
+  currency_code  String @db.VarChar(5)
+  payer_email    String @db.VarChar(255)
+  payment_status String @db.VarChar(255)
+}
+
+model db_permissions {
+  id          Int       @id @default(autoincrement())
+  store_id    Int?
+  role_id     Int?
+  permissions String?   @db.VarChar(50)
+  db_store    db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_permissions_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_purchase {
+  id                      Int                   @id @default(autoincrement())
+  store_id                Int?
+  warehouse_id            Int?
+  count_id                Int?
+  purchase_code           String?               @db.VarChar(50)
+  reference_no            String?               @db.VarChar(50)
+  purchase_date           DateTime?             @db.Date
+  purchase_status         String?               @db.VarChar(50)
+  supplier_id             Int?
+  other_charges_input     Float?
+  other_charges_tax_id    Int?
+  other_charges_amt       Float?
+  discount_to_all_input   Float?
+  discount_to_all_type    String?               @db.VarChar(50)
+  tot_discount_to_all_amt Float?
+  subtotal                Float?
+  round_off               Float?
+  grand_total             Float?
+  purchase_note           String?               @db.Text
+  payment_status          String?               @db.VarChar(50)
+  paid_amount             Float?
+  created_date            DateTime?             @db.Date
+  created_time            String?               @db.VarChar(50)
+  created_by              String?               @db.VarChar(50)
+  system_ip               String?               @db.VarChar(100)
+  system_name             String?               @db.VarChar(100)
+  company_id              Int?
+  status                  Int?
+  return_bit              Int?
+  db_store                db_store?             @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_purchase_ibfk_1")
+  db_suppliers            db_suppliers?         @relation(fields: [supplier_id], references: [id], onDelete: Cascade, map: "db_purchase_ibfk_2")
+  db_purchaseitems        db_purchaseitems[]
+  db_purchasepayments     db_purchasepayments[]
+  db_purchasereturn       db_purchasereturn[]
+
+  @@index([store_id], map: "store_id")
+  @@index([supplier_id], map: "supplier_id")
+}
+
+model db_purchaseitems {
+  id                Int          @id @default(autoincrement())
+  store_id          Int?
+  purchase_id       Int?
+  purchase_status   String?      @db.VarChar(50)
+  item_id           Int?
+  purchase_qty      Float?
+  price_per_unit    Float?
+  tax_type          String?      @db.VarChar(50)
+  tax_id            Int?
+  tax_amt           Float?
+  discount_type     String?      @db.VarChar(50)
+  discount_input    Float?
+  discount_amt      Float?
+  unit_total_cost   Float?
+  total_cost        Float?
+  profit_margin_per Float?
+  unit_sales_price  Float?
+  status            Int?
+  description       String?      @db.Text
+  db_purchase       db_purchase? @relation(fields: [purchase_id], references: [id], onDelete: Cascade, map: "db_purchaseitems_ibfk_1")
+
+  @@index([purchase_id], map: "purchase_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_purchaseitemsreturn {
+  id                Int                @id @default(autoincrement())
+  store_id          Int?
+  purchase_id       Int?
+  return_id         Int?
+  return_status     String?            @db.VarChar(50)
+  item_id           Int?
+  return_qty        Float?
+  price_per_unit    Float?
+  tax_id            Int?
+  tax_amt           Float?
+  tax_type          String?            @db.VarChar(50)
+  discount_input    Float?
+  discount_amt      Float?
+  discount_type     String?            @db.VarChar(50)
+  unit_total_cost   Float?
+  total_cost        Float?
+  profit_margin_per Float?
+  unit_sales_price  Float?
+  status            Int?
+  description       String?            @db.Text
+  db_store          db_store?          @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_purchaseitemsreturn_ibfk_1")
+  db_purchasereturn db_purchasereturn? @relation(fields: [return_id], references: [id], onDelete: Cascade, map: "db_purchaseitemsreturn_ibfk_2")
+
+  @@index([purchase_id], map: "purchase_id")
+  @@index([return_id], map: "return_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_purchasepayments {
+  id                   Int                    @id @default(autoincrement())
+  count_id             Int?
+  payment_code         String?                @db.VarChar(50)
+  store_id             Int?
+  purchase_id          Int?
+  payment_date         DateTime?              @db.Date
+  payment_type         String?                @db.VarChar(50)
+  payment              Float?
+  payment_note         String?                @db.Text
+  system_ip            String?                @db.VarChar(50)
+  system_name          String?                @db.VarChar(50)
+  created_time         DateTime?              @db.Time(0)
+  created_date         DateTime?              @db.Date
+  created_by           String?                @db.VarChar(50)
+  status               Int?
+  account_id           Int?
+  supplier_id          Int?
+  short_code           String?                @db.VarChar(50)
+  ac_transactions      ac_transactions[]
+  db_store             db_store?              @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_purchasepayments_ibfk_1")
+  db_purchase          db_purchase?           @relation(fields: [purchase_id], references: [id], onDelete: Cascade, map: "db_purchasepayments_ibfk_2")
+  db_suppliers         db_suppliers?          @relation(fields: [supplier_id], references: [id], onDelete: Cascade, map: "db_purchasepayments_ibfk_3")
+  db_supplier_payments db_supplier_payments[]
+
+  @@index([purchase_id], map: "purchase_id")
+  @@index([store_id], map: "store_id")
+  @@index([supplier_id], map: "supplier_id")
+}
+
+model db_purchasepaymentsreturn {
+  id                Int                @id @default(autoincrement())
+  count_id          Int?
+  payment_code      String?            @db.VarChar(50)
+  store_id          Int?
+  purchase_id       Int?
+  return_id         Int?
+  payment_date      DateTime?          @db.Date
+  payment_type      String?            @db.VarChar(50)
+  payment           Float?
+  payment_note      String?            @db.Text
+  system_ip         String?            @db.VarChar(50)
+  system_name       String?            @db.VarChar(50)
+  created_time      DateTime?          @db.Time(0)
+  created_date      DateTime?          @db.Date
+  created_by        String?            @db.VarChar(50)
+  status            Int?
+  account_id        Int?
+  supplier_id       Int?
+  short_code        String?            @db.VarChar(50)
+  ac_transactions   ac_transactions[]
+  db_store          db_store?          @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_purchasepaymentsreturn_ibfk_1")
+  db_purchasereturn db_purchasereturn? @relation(fields: [return_id], references: [id], onDelete: Cascade, map: "db_purchasepaymentsreturn_ibfk_2")
+  db_suppliers      db_suppliers?      @relation(fields: [supplier_id], references: [id], onDelete: Cascade, map: "db_purchasepaymentsreturn_ibfk_3")
+
+  @@index([return_id], map: "return_id")
+  @@index([store_id], map: "store_id")
+  @@index([supplier_id], map: "supplier_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_purchasereturn {
+  id                        Int                         @id @default(autoincrement())
+  store_id                  Int?
+  count_id                  Int?
+  warehouse_id              Int?
+  purchase_id               Int?
+  return_code               String?                     @db.VarChar(50)
+  reference_no              String?                     @db.VarChar(50)
+  return_date               DateTime?                   @db.Date
+  return_status             String?                     @db.VarChar(50)
+  supplier_id               Int?
+  other_charges_input       Float?
+  other_charges_tax_id      Int?
+  other_charges_amt         Float?
+  discount_to_all_input     Float?
+  discount_to_all_type      String?                     @db.VarChar(50)
+  tot_discount_to_all_amt   Float?
+  subtotal                  Float?
+  round_off                 Float?
+  grand_total               Float?
+  return_note               String?                     @db.Text
+  payment_status            String?                     @db.VarChar(50)
+  paid_amount               Float?
+  created_date              DateTime?                   @db.Date
+  created_time              String?                     @db.VarChar(50)
+  created_by                String?                     @db.VarChar(50)
+  system_ip                 String?                     @db.VarChar(100)
+  system_name               String?                     @db.VarChar(100)
+  company_id                Int?
+  status                    Int?
+  db_purchaseitemsreturn    db_purchaseitemsreturn[]
+  db_purchasepaymentsreturn db_purchasepaymentsreturn[]
+  db_store                  db_store?                   @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_purchasereturn_ibfk_1")
+  db_purchase               db_purchase?                @relation(fields: [purchase_id], references: [id], onDelete: Cascade, map: "db_purchasereturn_ibfk_2")
+
+  @@index([purchase_id], map: "purchase_id")
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_quotation {
+  id                      Int                 @id @default(autoincrement())
+  store_id                Int?
+  warehouse_id            Int?
+  count_id                Int?
+  quotation_code          String?             @db.VarChar(50)
+  reference_no            String?             @db.VarChar(50)
+  quotation_date          DateTime?           @db.Date
+  expire_date             DateTime?           @db.Date
+  quotation_status        String?             @db.VarChar(50)
+  customer_id             Int?
+  other_charges_input     Float?
+  other_charges_tax_id    Int?
+  other_charges_amt       Float?
+  discount_to_all_input   Float?
+  discount_to_all_type    String?             @db.VarChar(50)
+  tot_discount_to_all_amt Float?
+  subtotal                Float?
+  round_off               Float?
+  grand_total             Float?
+  quotation_note          String?             @db.Text
+  payment_status          String?             @db.VarChar(50)
+  paid_amount             Float?
+  created_date            DateTime?           @db.Date
+  created_time            String?             @db.VarChar(50)
+  created_by              String?             @db.VarChar(50)
+  system_ip               String?             @db.VarChar(100)
+  system_name             String?             @db.VarChar(100)
+  company_id              Int?
+  pos                     Int?
+  status                  Int?
+  return_bit              Int?
+  customer_previous_due   Float?
+  customer_total_due      Float?
+  sales_status            String?             @db.VarChar(50)
+  db_store                db_store?           @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_quotation_ibfk_1")
+  db_customers            db_customers?       @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_quotation_ibfk_2")
+  db_warehouse            db_warehouse?       @relation(fields: [warehouse_id], references: [id], onDelete: Cascade, map: "db_quotation_ibfk_3")
+  db_quotationitems       db_quotationitems[]
+
+  @@index([customer_id], map: "customer_id")
+  @@index([store_id], map: "store_id")
+  @@index([warehouse_id], map: "warehouse_id")
+}
+
+model db_quotationitems {
+  id               Int           @id @default(autoincrement())
+  store_id         Int?
+  quotation_id     Int?
+  quotation_status String?       @db.VarChar(50)
+  item_id          Int?
+  description      String?       @db.Text
+  quotation_qty    Float?
+  price_per_unit   Float?
+  tax_type         String?       @db.VarChar(50)
+  tax_id           Int?
+  tax_amt          Float?
+  discount_type    String?       @db.VarChar(50)
+  discount_input   Float?
+  discount_amt     Float?
+  unit_total_cost  Float?
+  total_cost       Float?
+  status           Int?
+  seller_points    Float?        @default(0.0000)
+  db_store         db_store?     @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_quotationitems_ibfk_1")
+  db_quotation     db_quotation? @relation(fields: [quotation_id], references: [id], onDelete: Cascade, map: "db_quotationitems_ibfk_2")
+
+  @@index([quotation_id], map: "quotation_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_roles {
+  id          Int       @id @default(autoincrement())
+  store_id    Int?
+  role_name   String?   @db.VarChar(50)
+  description String?   @db.MediumText
+  status      Int?
+  db_store    db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_roles_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_sales {
+  id                      Int                  @id @default(autoincrement())
+  store_id                Int?
+  warehouse_id            Int?
+  init_code               String?              @db.VarChar(100)
+  count_id                Decimal?             @db.Decimal(20, 0)
+  sales_code              String?              @db.VarChar(50)
+  reference_no            String?              @db.VarChar(50)
+  sales_date              DateTime?            @db.Date
+  due_date                DateTime?            @db.Date
+  sales_status            String?              @db.VarChar(50)
+  customer_id             Int?
+  other_charges_input     Float?
+  other_charges_tax_id    Int?
+  other_charges_amt       Float?
+  discount_to_all_input   Float?
+  discount_to_all_type    String?              @db.VarChar(50)
+  tot_discount_to_all_amt Float?
+  subtotal                Float?
+  round_off               Float?
+  grand_total             Float?
+  sales_note              String?              @db.Text
+  payment_status          String?              @db.VarChar(50)
+  paid_amount             Float?
+  created_date            DateTime?            @db.Date
+  created_time            String?              @db.VarChar(50)
+  created_by              String?              @db.VarChar(50)
+  system_ip               String?              @db.VarChar(100)
+  system_name             String?              @db.VarChar(100)
+  company_id              Int?
+  pos                     Int?
+  status                  Int?
+  return_bit              Int?
+  customer_previous_due   Float?
+  customer_total_due      Float?
+  quotation_id            Int?
+  coupon_id               Int?
+  coupon_amt              Float?               @default(0.00)
+  invoice_terms           String?              @db.Text
+  db_store                db_store?            @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_sales_ibfk_1")
+  db_customers            db_customers?        @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_sales_ibfk_2")
+  db_warehouse            db_warehouse?        @relation(fields: [warehouse_id], references: [id], onDelete: Cascade, map: "db_sales_ibfk_3")
+  db_customer_coupons     db_customer_coupons? @relation(fields: [coupon_id], references: [id], onDelete: Cascade, map: "db_sales_ibfk_4")
+  db_salesitems           db_salesitems[]
+  db_salespayments        db_salespayments[]
+  db_salesreturn          db_salesreturn[]
+
+  @@index([coupon_id], map: "coupon_id")
+  @@index([customer_id], map: "customer_id")
+  @@index([store_id], map: "store_id")
+  @@index([warehouse_id], map: "warehouse_id")
+}
+
+model db_salesitems {
+  id              Int       @id @default(autoincrement())
+  store_id        Int?
+  sales_id        Int?
+  sales_status    String?   @db.VarChar(50)
+  item_id         Int?
+  description     String?   @db.Text
+  sales_qty       Float?
+  price_per_unit  Float?
+  tax_type        String?   @db.VarChar(50)
+  tax_id          Int?
+  tax_amt         Float?
+  discount_type   String?   @db.VarChar(50)
+  discount_input  Float?
+  discount_amt    Float?
+  unit_total_cost Float?
+  total_cost      Float?
+  status          Int?
+  seller_points   Float?    @default(0.00)
+  purchase_price  Float?    @default(0.000)
+  db_store        db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_salesitems_ibfk_1")
+  db_sales        db_sales? @relation(fields: [sales_id], references: [id], onDelete: Cascade, map: "db_salesitems_ibfk_2")
+
+  @@index([sales_id], map: "sales_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_salesitemsreturn {
+  id              Int             @id @default(autoincrement())
+  store_id        Int?
+  sales_id        Int?
+  return_id       Int?
+  return_status   String?         @db.VarChar(50)
+  item_id         Int?
+  return_qty      Float?
+  price_per_unit  Float?
+  tax_type        String?         @db.VarChar(50)
+  tax_id          Int?
+  tax_amt         Float?
+  discount_input  Float?
+  discount_amt    Float?
+  discount_type   String?         @db.VarChar(50)
+  unit_total_cost Float?
+  total_cost      Float?
+  status          Int?
+  description     String?         @db.Text
+  purchase_price  Float?          @default(0.000)
+  db_store        db_store?       @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_salesitemsreturn_ibfk_1")
+  db_salesreturn  db_salesreturn? @relation(fields: [return_id], references: [id], onDelete: Cascade, map: "db_salesitemsreturn_ibfk_2")
+
+  @@index([return_id], map: "return_id")
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_salespayments {
+  id                   Int                    @id @default(autoincrement())
+  count_id             Int?
+  payment_code         String?                @db.VarChar(50)
+  store_id             Int?
+  sales_id             Int?
+  payment_date         DateTime?              @db.Date
+  payment_type         String?                @db.VarChar(50)
+  payment              Float?
+  payment_note         String?                @db.Text
+  change_return        Float?
+  system_ip            String?                @db.VarChar(50)
+  system_name          String?                @db.VarChar(50)
+  created_time         String?                @db.VarChar(50)
+  created_date         DateTime?              @db.Date
+  created_by           String?                @db.VarChar(50)
+  status               Int?
+  account_id           Int?
+  customer_id          Int?
+  short_code           String?                @db.VarChar(50)
+  advance_adjusted     Float?
+  cheque_number        String?                @db.VarChar(100)
+  cheque_period        Int?
+  cheque_status        String?                @db.VarChar(100)
+  ac_transactions      ac_transactions[]
+  db_customer_payments db_customer_payments[]
+  db_store             db_store?              @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_salespayments_ibfk_1")
+  db_sales             db_sales?              @relation(fields: [sales_id], references: [id], onDelete: Cascade, map: "db_salespayments_ibfk_2")
+  db_customers         db_customers?          @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_salespayments_ibfk_3")
+
+  @@index([customer_id], map: "customer_id")
+  @@index([sales_id], map: "sales_id")
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_salespaymentsreturn {
+  id              Int               @id @default(autoincrement())
+  count_id        Int?
+  payment_code    String?           @db.VarChar(50)
+  store_id        Int?
+  sales_id        Int?
+  return_id       Int?
+  payment_date    DateTime?         @db.Date
+  payment_type    String?           @db.VarChar(50)
+  payment         Float?
+  payment_note    String?           @db.Text
+  change_return   Float?
+  system_ip       String?           @db.VarChar(50)
+  system_name     String?           @db.VarChar(50)
+  created_time    DateTime?         @db.Time(0)
+  created_date    DateTime?         @db.Date
+  created_by      String?           @db.VarChar(50)
+  status          Int?
+  account_id      Int?
+  customer_id     Int?
+  short_code      String?           @db.VarChar(50)
+  ac_transactions ac_transactions[]
+  db_store        db_store?         @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_salespaymentsreturn_ibfk_1")
+  db_salesreturn  db_salesreturn?   @relation(fields: [return_id], references: [id], onDelete: Cascade, map: "db_salespaymentsreturn_ibfk_2")
+  db_customers    db_customers?     @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_salespaymentsreturn_ibfk_3")
+
+  @@index([customer_id], map: "db_salespaymentsreturn_ibfk_3")
+  @@index([return_id], map: "return_id")
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_salesreturn {
+  id                      Int                      @id @default(autoincrement())
+  store_id                Int?
+  count_id                Int?
+  sales_id                Int?
+  warehouse_id            Int?
+  return_code             String?                  @db.VarChar(50)
+  reference_no            String?                  @db.VarChar(50)
+  return_date             DateTime?                @db.Date
+  return_status           String?                  @db.VarChar(50)
+  customer_id             Int?
+  other_charges_input     Float?
+  other_charges_tax_id    Int?
+  other_charges_amt       Float?
+  discount_to_all_input   Float?
+  discount_to_all_type    String?                  @db.VarChar(50)
+  tot_discount_to_all_amt Float?
+  subtotal                Float?
+  round_off               Float?
+  grand_total             Float?
+  return_note             String?                  @db.Text
+  payment_status          String?                  @db.VarChar(50)
+  paid_amount             Float?
+  created_date            DateTime?                @db.Date
+  created_time            String?                  @db.VarChar(50)
+  created_by              String?                  @db.VarChar(50)
+  system_ip               String?                  @db.VarChar(100)
+  system_name             String?                  @db.VarChar(100)
+  company_id              Int?
+  pos                     Int?
+  status                  Int?
+  return_bit              Int?
+  coupon_id               Int?
+  coupon_amt              Float?                   @default(0.00)
+  db_salesitemsreturn     db_salesitemsreturn[]
+  db_salespaymentsreturn  db_salespaymentsreturn[]
+  db_store                db_store?                @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_salesreturn_ibfk_1")
+  db_sales                db_sales?                @relation(fields: [sales_id], references: [id], onDelete: Cascade, map: "db_salesreturn_ibfk_2")
+  db_customer_coupons     db_customer_coupons?     @relation(fields: [coupon_id], references: [id], onDelete: Cascade, map: "db_salesreturn_ibfk_3")
+
+  @@index([coupon_id], map: "coupon_id")
+  @@index([sales_id], map: "sales_id")
+  @@index([store_id], map: "store_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model db_shippingaddress {
+  id            Int           @default(autoincrement())
+  store_id      Int?
+  country_id    Int?
+  state_id      Int?
+  city          String?       @db.VarChar(100)
+  postcode      String?       @db.VarChar(20)
+  address       String?       @db.Text
+  status        Int?
+  customer_id   Int?
+  location_link String?       @db.Text
+  db_customers  db_customers? @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "db_shippingaddress_ibfk_1")
+  db_store      db_store?     @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_shippingaddress_ibfk_2")
+
+  @@index([customer_id], map: "customer_id")
+  @@index([id], map: "id")
+  @@index([store_id], map: "store_id")
+  @@ignore
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_sitesettings {
+  id          Int     @id @default(autoincrement())
+  version     String? @db.VarChar(10)
+  site_name   String? @db.VarChar(100)
+  logo        String? @db.MediumText
+  machine_id  String? @db.Text
+  domain      String? @db.Text
+  unique_code String? @db.Text
+}
+
+model db_smsapi {
+  id         Int       @id @default(autoincrement())
+  store_id   Int?
+  info       String?   @db.VarChar(150)
+  key        String?   @db.VarChar(600)
+  key_value  String?   @db.VarChar(600)
+  delete_bit Int?
+  db_store   db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_smsapi_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_smstemplates {
+  id            Int       @id @default(autoincrement())
+  store_id      Int?
+  template_name String?   @db.VarChar(100)
+  content       String?   @db.Text
+  variables     String?   @db.Text
+  status        Int?
+  undelete_bit  Int?
+  db_store      db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_smstemplates_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_sobpayments {
+  id           Int       @id @default(autoincrement())
+  supplier_id  Int?
+  payment_date DateTime? @db.Date
+  payment_type String?   @db.VarChar(50)
+  payment      Float?
+  payment_note String?   @db.MediumText
+  system_ip    String?   @db.VarChar(50)
+  system_name  String?   @db.VarChar(50)
+  created_time DateTime? @db.Time(0)
+  created_date DateTime? @db.Date
+  created_by   String?   @db.VarChar(50)
+  status       Int?
+}
+
+model db_states {
+  id           Int       @id @default(autoincrement())
+  store_id     Int?
+  state_code   String?   @db.VarChar(10)
+  state        String?   @db.VarChar(4050)
+  country_code String?   @db.VarChar(15)
+  country_id   Int?
+  country      String?   @db.VarChar(15)
+  added_on     DateTime? @db.Date
+  company_id   Int?
+  status       Int?
+  db_store     db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_states_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_stockadjustment {
+  id                      Int                       @id @default(autoincrement())
+  store_id                Int?
+  warehouse_id            Int?
+  reference_no            String?                   @db.VarChar(50)
+  adjustment_date         DateTime?                 @db.Date
+  adjustment_note         String?                   @db.MediumText
+  created_date            DateTime?                 @db.Date
+  created_time            String?                   @db.VarChar(50)
+  created_by              String?                   @db.VarChar(50)
+  system_ip               String?                   @db.VarChar(100)
+  system_name             String?                   @db.VarChar(100)
+  status                  Int?
+  db_store                db_store?                 @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_stockadjustment_ibfk_1")
+  db_stockadjustmentitems db_stockadjustmentitems[]
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_stockadjustmentitems {
+  id                 Int                 @id @default(autoincrement())
+  store_id           Int?
+  warehouse_id       Int?
+  adjustment_id      Int?
+  item_id            Int?
+  adjustment_qty     Float?
+  status             Int?
+  description        String?             @db.Text
+  db_stockadjustment db_stockadjustment? @relation(fields: [adjustment_id], references: [id], onDelete: Cascade, map: "db_stockadjustmentitems_ibfk_1")
+  db_items           db_items?           @relation(fields: [item_id], references: [id], onDelete: Cascade, map: "db_stockadjustmentitems_ibfk_2")
+  db_store           db_store?           @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_stockadjustmentitems_ibfk_3")
+  db_warehouse       db_warehouse?       @relation(fields: [warehouse_id], references: [id], onDelete: Cascade, map: "db_stockadjustmentitems_ibfk_4")
+
+  @@index([item_id], map: "item_id")
+  @@index([adjustment_id], map: "purchase_id")
+  @@index([store_id], map: "store_id")
+  @@index([warehouse_id], map: "warehouse_id")
+}
+
+model db_stockentry {
+  id         Int       @id @default(autoincrement())
+  entry_date DateTime? @db.Date
+  item_id    Int?
+  qty        Int?
+  status     Int?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_stocktransfer {
+  id                                                         Int                     @id @default(autoincrement())
+  store_id                                                   Int?
+  to_store_id                                                Int?
+  warehouse_from                                             Int?
+  warehouse_to                                               Int?
+  transfer_date                                              DateTime?               @db.Date
+  note                                                       String?                 @db.Text
+  created_by                                                 String?                 @db.VarChar(50)
+  created_date                                               DateTime?               @db.Date
+  created_time                                               String?                 @db.VarChar(50)
+  system_ip                                                  String?                 @db.VarChar(50)
+  system_name                                                String?                 @db.VarChar(50)
+  status                                                     Int?
+  db_store_db_stocktransfer_store_idTodb_store               db_store?               @relation("db_stocktransfer_store_idTodb_store", fields: [store_id], references: [id], onDelete: Cascade, map: "db_stocktransfer_ibfk_1")
+  db_warehouse_db_stocktransfer_warehouse_fromTodb_warehouse db_warehouse?           @relation("db_stocktransfer_warehouse_fromTodb_warehouse", fields: [warehouse_from], references: [id], onDelete: Cascade, map: "db_stocktransfer_ibfk_2")
+  db_warehouse_db_stocktransfer_warehouse_toTodb_warehouse   db_warehouse?           @relation("db_stocktransfer_warehouse_toTodb_warehouse", fields: [warehouse_to], references: [id], onDelete: Cascade, map: "db_stocktransfer_ibfk_3")
+  db_store_db_stocktransfer_to_store_idTodb_store            db_store?               @relation("db_stocktransfer_to_store_idTodb_store", fields: [to_store_id], references: [id], onDelete: Cascade, map: "db_stocktransfer_ibfk_4")
+  db_stocktransferitems                                      db_stocktransferitems[]
+
+  @@index([to_store_id], map: "db_stocktransfer_ibfk_4")
+  @@index([store_id], map: "store_id")
+  @@index([warehouse_from], map: "warehouse_id")
+  @@index([warehouse_to], map: "warehouse_to")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_stocktransferitems {
+  id                                                              Int               @id @default(autoincrement())
+  stocktransfer_id                                                Int?
+  store_id                                                        Int?
+  to_store_id                                                     Int?
+  warehouse_from                                                  Int?
+  warehouse_to                                                    Int?
+  item_id                                                         Int?
+  transfer_qty                                                    Float?
+  status                                                          Int?
+  db_store_db_stocktransferitems_store_idTodb_store               db_store?         @relation("db_stocktransferitems_store_idTodb_store", fields: [store_id], references: [id], onDelete: Cascade, map: "db_stocktransferitems_ibfk_1")
+  db_warehouse_db_stocktransferitems_warehouse_fromTodb_warehouse db_warehouse?     @relation("db_stocktransferitems_warehouse_fromTodb_warehouse", fields: [warehouse_from], references: [id], onDelete: Cascade, map: "db_stocktransferitems_ibfk_2")
+  db_warehouse_db_stocktransferitems_warehouse_toTodb_warehouse   db_warehouse?     @relation("db_stocktransferitems_warehouse_toTodb_warehouse", fields: [warehouse_to], references: [id], onDelete: Cascade, map: "db_stocktransferitems_ibfk_3")
+  db_stocktransfer                                                db_stocktransfer? @relation(fields: [stocktransfer_id], references: [id], onDelete: Cascade, map: "db_stocktransferitems_ibfk_4")
+  db_items                                                        db_items?         @relation(fields: [item_id], references: [id], onDelete: Cascade, map: "db_stocktransferitems_ibfk_5")
+  db_store_db_stocktransferitems_to_store_idTodb_store            db_store?         @relation("db_stocktransferitems_to_store_idTodb_store", fields: [to_store_id], references: [id], onDelete: Cascade, map: "db_stocktransferitems_ibfk_6")
+
+  @@index([to_store_id], map: "db_stocktransferitems_ibfk_6")
+  @@index([item_id], map: "item_id")
+  @@index([stocktransfer_id], map: "stocktranfer_id")
+  @@index([store_id], map: "store_id")
+  @@index([warehouse_from], map: "warehouse_from")
+  @@index([warehouse_to], map: "warehouse_to")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_store {
+  id                                                                Int                         @id @default(autoincrement())
+  store_code                                                        String?                     @db.VarChar(150)
+  store_name                                                        String?                     @db.VarChar(150)
+  store_website                                                     String?                     @db.VarChar(150)
+  mobile                                                            String?                     @db.VarChar(150)
+  phone                                                             String?                     @db.VarChar(150)
+  email                                                             String?                     @db.VarChar(100)
+  website                                                           String?                     @db.VarChar(250)
+  store_logo                                                        String?                     @db.Text
+  logo                                                              String?                     @db.MediumText
+  upi_id                                                            String?                     @db.VarChar(50)
+  upi_code                                                          String?                     @db.Text
+  country                                                           String?                     @db.VarChar(150)
+  state                                                             String?                     @db.VarChar(150)
+  city                                                              String?                     @db.VarChar(100)
+  address                                                           String?                     @db.VarChar(300)
+  postcode                                                          String?                     @db.VarChar(50)
+  gst_no                                                            String?                     @db.VarChar(50)
+  vat_no                                                            String?                     @db.VarChar(50)
+  pan_no                                                            String?                     @db.VarChar(50)
+  bank_details                                                      String?                     @db.MediumText
+  cid                                                               Int?
+  category_init                                                     String?                     @db.VarChar(50)
+  item_init                                                         String?                     @db.VarChar(50)
+  supplier_init                                                     String?                     @db.VarChar(50)
+  purchase_init                                                     String?                     @db.VarChar(50)
+  purchase_return_init                                              String?                     @db.VarChar(50)
+  customer_init                                                     String?                     @db.VarChar(50)
+  sales_init                                                        String?                     @db.VarChar(50)
+  sales_return_init                                                 String?                     @db.VarChar(50)
+  expense_init                                                      String?                     @db.VarChar(50)
+  accounts_init                                                     String?                     @db.VarChar(50)
+  journal_init                                                      String?                     @db.VarChar(50)
+  cust_advance_init                                                 String?                     @db.VarChar(50)
+  invoice_view                                                      Int?
+  sms_status                                                        Int?
+  status                                                            Int?
+  language_id                                                       Int?
+  currency_id                                                       Int?
+  currency_placement                                                String?                     @db.VarChar(50)
+  timezone                                                          String?                     @db.VarChar(50)
+  date_format                                                       String?                     @db.VarChar(50)
+  time_format                                                       Int?
+  sales_discount                                                    Float?
+  currencysymbol_id                                                 Int?
+  regno_key                                                         String?                     @db.VarChar(50)
+  fav_icon                                                          String?                     @db.Text
+  purchase_code                                                     String?                     @db.Text
+  change_return                                                     Int?
+  sales_invoice_format_id                                           Int?
+  pos_invoice_format_id                                             Int?
+  sales_invoice_footer_text                                         String?                     @db.Text
+  round_off                                                         Int?
+  created_date                                                      DateTime?                   @db.Date
+  created_time                                                      String?                     @db.VarChar(50)
+  created_by                                                        String?                     @db.VarChar(50)
+  system_ip                                                         String?                     @db.VarChar(50)
+  system_name                                                       String?                     @db.VarChar(50)
+  quotation_init                                                    String?                     @db.VarChar(50)
+  decimals                                                          Int?                        @default(2)
+  money_transfer_init                                               String?                     @db.VarChar(50)
+  sales_payment_init                                                String?                     @db.VarChar(50)
+  sales_return_payment_init                                         String?                     @db.VarChar(50)
+  purchase_payment_init                                             String?                     @db.VarChar(50)
+  purchase_return_payment_init                                      String?                     @db.VarChar(50)
+  expense_payment_init                                              String?                     @db.VarChar(50)
+  current_subscriptionlist_id                                       Int?                        @default(0)
+  smtp_host                                                         String?                     @db.VarChar(250)
+  smtp_port                                                         String?                     @db.VarChar(250)
+  smtp_user                                                         String?                     @db.VarChar(250)
+  smtp_pass                                                         String?                     @db.VarChar(250)
+  smtp_status                                                       Int?                        @default(0)
+  sms_url                                                           String?                     @db.Text
+  user_id                                                           Int
+  mrp_column                                                        Int?                        @default(0)
+  qty_decimals                                                      Int?                        @default(2)
+  signature                                                         String?                     @db.Text
+  show_signature                                                    Int?                        @default(0)
+  invoice_terms                                                     String?                     @db.Text
+  previous_balance_bit                                              Int?                        @default(1)
+  t_and_c_status                                                    Int?                        @default(1)
+  t_and_c_status_pos                                                Int?                        @default(1)
+  number_to_words                                                   String?                     @default("Default") @db.VarChar(250)
+  default_account_id                                                Int?
+  ac_accounts                                                       ac_accounts[]
+  ac_moneydeposits                                                  ac_moneydeposits[]
+  ac_moneytransfer                                                  ac_moneytransfer[]
+  ac_transactions                                                   ac_transactions[]
+  db_bankdetails                                                    db_bankdetails[]
+  db_brands                                                         db_brands[]
+  db_category                                                       db_category[]
+  db_coupons                                                        db_coupons[]
+  db_custadvance                                                    db_custadvance[]
+  db_customer_coupons                                               db_customer_coupons[]
+  db_customers                                                      db_customers[]
+  db_emailtemplates                                                 db_emailtemplates[]
+  db_expense                                                        db_expense[]
+  db_expense_category                                               db_expense_category[]
+  db_fivemojo                                                       db_fivemojo[]
+  db_hold                                                           db_hold[]
+  db_holditems                                                      db_holditems[]
+  db_instamojo                                                      db_instamojo[]
+  db_items                                                          db_items[]
+  db_package                                                        db_package[]
+  db_paymenttypes                                                   db_paymenttypes[]
+  db_paypal                                                         db_paypal[]
+  db_permissions                                                    db_permissions[]
+  db_purchase                                                       db_purchase[]
+  db_purchaseitemsreturn                                            db_purchaseitemsreturn[]
+  db_purchasepayments                                               db_purchasepayments[]
+  db_purchasepaymentsreturn                                         db_purchasepaymentsreturn[]
+  db_purchasereturn                                                 db_purchasereturn[]
+  db_quotation                                                      db_quotation[]
+  db_quotationitems                                                 db_quotationitems[]
+  db_roles                                                          db_roles[]
+  db_sales                                                          db_sales[]
+  db_salesitems                                                     db_salesitems[]
+  db_salesitemsreturn                                               db_salesitemsreturn[]
+  db_salespayments                                                  db_salespayments[]
+  db_salespaymentsreturn                                            db_salespaymentsreturn[]
+  db_salesreturn                                                    db_salesreturn[]
+  db_shippingaddress                                                db_shippingaddress[]        @ignore
+  db_smsapi                                                         db_smsapi[]
+  db_smstemplates                                                   db_smstemplates[]
+  db_states                                                         db_states[]
+  db_stockadjustment                                                db_stockadjustment[]
+  db_stockadjustmentitems                                           db_stockadjustmentitems[]
+  db_stocktransfer_db_stocktransfer_store_idTodb_store              db_stocktransfer[]          @relation("db_stocktransfer_store_idTodb_store")
+  db_stocktransfer_db_stocktransfer_to_store_idTodb_store           db_stocktransfer[]          @relation("db_stocktransfer_to_store_idTodb_store")
+  db_stocktransferitems_db_stocktransferitems_store_idTodb_store    db_stocktransferitems[]     @relation("db_stocktransferitems_store_idTodb_store")
+  db_stocktransferitems_db_stocktransferitems_to_store_idTodb_store db_stocktransferitems[]     @relation("db_stocktransferitems_to_store_idTodb_store")
+  db_stripe                                                         db_stripe[]
+  db_suppliers                                                      db_suppliers[]
+  db_tax                                                            db_tax[]
+  db_twilio                                                         db_twilio[]
+  db_units                                                          db_units[]
+  db_users                                                          db_users[]
+  db_variants                                                       db_variants[]
+  db_warehouse                                                      db_warehouse[]
+  db_warehouseitems                                                 db_warehouseitems[]
+}
+
+model db_stripe {
+  id              Int       @id @default(autoincrement())
+  store_id        Int?
+  sandbox         Int?
+  publishable_key String?   @db.Text
+  api_secret      String?   @db.Text
+  updated_at      DateTime? @db.Date
+  updated_by      String?   @db.VarChar(50)
+  status          Int?
+  db_store        db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_stripe_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_stripepayments {
+  id                   Int      @id @default(autoincrement())
+  product_id           Int
+  buyer_name           String   @db.VarChar(50)
+  buyer_email          String   @db.VarChar(50)
+  paid_amount          String   @db.VarChar(10)
+  paid_amount_currency String   @db.VarChar(10)
+  txn_id               String   @db.VarChar(50)
+  payment_status       String   @db.VarChar(25)
+  created              DateTime @default(now()) @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_subscription {
+  id                Int       @id @default(autoincrement())
+  store_id          Int?
+  payment_id        String?   @db.VarChar(250)
+  package_id        Int?
+  package_type      String?   @db.VarChar(50)
+  package_name      String?   @db.VarChar(50)
+  description       String?   @db.Text
+  subscription_date DateTime? @db.Date
+  expire_date       DateTime? @db.Date
+  trial_days        Int?
+  max_users         Int?
+  max_warehouses    Int?
+  max_items         Int?
+  max_invoices      Int?
+  payment_by        String?   @db.VarChar(50)
+  txn_id            String?   @db.VarChar(250)
+  payment_gross     Float?
+  currency_code     String?   @db.VarChar(50)
+  payer_email       String?   @db.VarChar(250)
+  payment_status    String?   @db.VarChar(250)
+  created_date      DateTime? @db.Date
+  created_time      String?   @db.VarChar(20)
+  created_by        String?   @db.VarChar(50)
+  system_ip         String?   @db.VarChar(50)
+  system_name       String?   @db.VarChar(100)
+  package_status    String?   @db.VarChar(100)
+  payment_type      String?   @db.VarChar(250)
+  package_count     Int?
+}
+
+model db_supplier_payments {
+  id                  Int                  @id @default(autoincrement())
+  purchasepayment_id  Int?
+  supplier_id         Int?
+  payment_date        DateTime?            @db.Date
+  payment_type        String?              @db.VarChar(50)
+  payment             Float?
+  payment_note        String?              @db.Text
+  system_ip           String?              @db.VarChar(50)
+  system_name         String?              @db.VarChar(50)
+  created_time        String?              @db.VarChar(50)
+  created_date        String?              @db.VarChar(50)
+  created_by          String?              @db.VarChar(50)
+  status              Int?
+  db_suppliers        db_suppliers?        @relation(fields: [supplier_id], references: [id], onDelete: Cascade, map: "db_supplier_payments_ibfk_1")
+  db_purchasepayments db_purchasepayments? @relation(fields: [purchasepayment_id], references: [id], onDelete: Cascade, map: "db_supplier_payments_ibfk_2")
+
+  @@index([purchasepayment_id], map: "purchasepayment_id")
+  @@index([supplier_id], map: "supplier_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_suppliers {
+  id                        Int                         @id @default(autoincrement())
+  store_id                  Int?
+  count_id                  Int?
+  supplier_code             String?                     @db.VarChar(20)
+  supplier_name             String?                     @db.VarChar(50)
+  mobile                    String?                     @db.VarChar(15)
+  phone                     String?                     @db.VarChar(15)
+  email                     String?                     @db.VarChar(50)
+  gstin                     String?                     @db.VarChar(100)
+  tax_number                String?                     @db.VarChar(50)
+  vatin                     String?                     @db.VarChar(100)
+  opening_balance           Float?
+  purchase_due              Float?
+  purchase_return_due       Float?
+  country_id                Int?
+  state_id                  Int?
+  city                      String?                     @db.VarChar(50)
+  postcode                  String?                     @db.VarChar(10)
+  address                   String?                     @db.VarChar(250)
+  system_ip                 String?                     @db.VarChar(50)
+  system_name               String?                     @db.VarChar(50)
+  created_date              DateTime?                   @db.Date
+  created_time              String?                     @db.VarChar(30)
+  created_by                String?                     @db.VarChar(50)
+  company_id                Int?
+  status                    Int?
+  ac_accounts               ac_accounts[]
+  ac_transactions           ac_transactions[]
+  db_purchase               db_purchase[]
+  db_purchasepayments       db_purchasepayments[]
+  db_purchasepaymentsreturn db_purchasepaymentsreturn[]
+  db_supplier_payments      db_supplier_payments[]
+  db_store                  db_store?                   @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_suppliers_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model db_tax {
+  id         Int       @id @default(autoincrement())
+  store_id   Int?
+  tax_name   String?   @db.VarChar(50)
+  tax        Float?
+  group_bit  Int?
+  subtax_ids String?   @db.VarChar(10)
+  status     Int?
+  db_store   db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_tax_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_timezone {
+  id       Int     @id @default(autoincrement())
+  timezone String? @db.VarChar(100)
+  status   Int?
+}
+
+model db_twilio {
+  id           Int       @id @default(autoincrement())
+  store_id     Int?
+  account_sid  String?   @db.VarChar(250)
+  auth_token   String?   @db.VarChar(250)
+  twilio_phone String?   @db.VarChar(20)
+  status       Int?      @default(0)
+  db_store     db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_twilio_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_units {
+  id          Int       @id @default(autoincrement())
+  store_id    Int?
+  unit_name   String?   @db.VarChar(50)
+  description String?   @db.MediumText
+  company_id  Int?
+  status      Int?
+  db_store    db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_units_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_users {
+  id                   Int                  @id @default(autoincrement())
+  store_id             Int?
+  username             String?              @db.VarChar(50)
+  first_name           String?              @db.VarChar(100)
+  last_name            String?              @db.VarChar(100)
+  password             Bytes?               @db.Blob
+  member_of            String?              @db.VarChar(50)
+  firstname            String?              @db.VarChar(50)
+  lastname             String?              @db.VarChar(50)
+  mobile               String?              @db.VarChar(50)
+  email                String?              @db.VarChar(50)
+  photo                Bytes?               @db.Blob
+  gender               String?              @db.VarChar(50)
+  dob                  DateTime?            @db.Date
+  country              String?              @db.VarChar(50)
+  state                String?              @db.VarChar(50)
+  city                 String?              @db.VarChar(50)
+  address              Bytes?               @db.Blob
+  postcode             String?              @db.VarChar(50)
+  role_name            String?              @db.VarChar(50)
+  role_id              Int?
+  profile_picture      String?              @db.Text
+  created_date         DateTime?            @db.Date
+  created_time         String?              @db.VarChar(50)
+  created_by           String?              @db.VarChar(50)
+  system_ip            String?              @db.VarChar(100)
+  system_name          String?              @db.VarChar(100)
+  status               Float?
+  creater_id           Int?
+  updater_id           Int?
+  updated_at           DateTime?            @db.Timestamp(0)
+  default_warehouse_id Int?
+  db_store             db_store?            @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_users_ibfk_1")
+  db_userswarehouses   db_userswarehouses[]
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_userswarehouses {
+  id           Int           @id @default(autoincrement())
+  user_id      Int?
+  warehouse_id Int?
+  db_users     db_users?     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "db_userswarehouses_ibfk_1")
+  db_warehouse db_warehouse? @relation(fields: [warehouse_id], references: [id], onDelete: Cascade, map: "db_userswarehouses_ibfk_2")
+
+  @@index([user_id], map: "user_id")
+  @@index([warehouse_id], map: "warehouse_id")
+}
+
+model db_variants {
+  id           Int       @id @default(autoincrement())
+  store_id     Int?
+  variant_code String?   @db.VarChar(50)
+  variant_name String?   @db.VarChar(100)
+  description  String?   @db.MediumText
+  status       Int?
+  db_store     db_store? @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_variants_ibfk_1")
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_warehouse {
+  id                                                                       Int                       @id @default(autoincrement())
+  store_id                                                                 Int?
+  warehouse_type                                                           String?                   @db.VarChar(50)
+  warehouse_name                                                           String?                   @db.VarChar(50)
+  mobile                                                                   String?                   @db.VarChar(20)
+  email                                                                    String?                   @db.VarChar(50)
+  status                                                                   Int?
+  created_date                                                             DateTime?                 @db.Date
+  db_hold                                                                  db_hold[]
+  db_quotation                                                             db_quotation[]
+  db_sales                                                                 db_sales[]
+  db_stockadjustmentitems                                                  db_stockadjustmentitems[]
+  db_stocktransfer_db_stocktransfer_warehouse_fromTodb_warehouse           db_stocktransfer[]        @relation("db_stocktransfer_warehouse_fromTodb_warehouse")
+  db_stocktransfer_db_stocktransfer_warehouse_toTodb_warehouse             db_stocktransfer[]        @relation("db_stocktransfer_warehouse_toTodb_warehouse")
+  db_stocktransferitems_db_stocktransferitems_warehouse_fromTodb_warehouse db_stocktransferitems[]   @relation("db_stocktransferitems_warehouse_fromTodb_warehouse")
+  db_stocktransferitems_db_stocktransferitems_warehouse_toTodb_warehouse   db_stocktransferitems[]   @relation("db_stocktransferitems_warehouse_toTodb_warehouse")
+  db_userswarehouses                                                       db_userswarehouses[]
+  db_store                                                                 db_store?                 @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_warehouse_ibfk_1")
+  db_warehouseitems                                                        db_warehouseitems[]
+
+  @@index([store_id], map: "store_id")
+}
+
+model db_warehouseitems {
+  id            Int           @id @default(autoincrement())
+  store_id      Int?
+  warehouse_id  Int?
+  item_id       Int?
+  available_qty Float?
+  db_store      db_store?     @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_warehouseitems_ibfk_1")
+  db_warehouse  db_warehouse? @relation(fields: [warehouse_id], references: [id], onDelete: Cascade, map: "db_warehouseitems_ibfk_2")
+  db_items      db_items?     @relation(fields: [item_id], references: [id], onDelete: Cascade, map: "db_warehouseitems_ibfk_3")
+
+  @@index([item_id], map: "item_id")
+  @@index([store_id], map: "store_id")
+  @@index([warehouse_id], map: "warehouse_id")
+}
+
+model temp_holdinvoice {
+  id           Int       @id @default(autoincrement())
+  invoice_id   Int?
+  invoice_date DateTime? @db.Date
+  reference_id String?   @db.VarChar(50)
+  item_id      Int?
+  item_qty     Int?
+  item_price   Float?
+  tax          Float?
+  created_date DateTime? @db.Date
+  created_time String?   @db.VarChar(50)
+  created_by   String?   @db.VarChar(50)
+  system_ip    String?   @db.VarChar(50)
+  system_name  String?   @db.VarChar(50)
+  pos          Int?
+  status       Int?
+}
