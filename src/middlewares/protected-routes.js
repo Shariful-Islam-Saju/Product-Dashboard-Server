@@ -17,7 +17,6 @@ export const protectedRoute = (req, res, next) => {
 
     // Verify JWT token
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log(decoded);
     // Attach user info to request
     req.user = {
       userId: decoded.userId,
