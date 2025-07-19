@@ -20,7 +20,7 @@ export const loginUser = async (req, res) => {
     });
 
     if (!user || !user.password) {
-      return res.status(401).json({ message: "❌ Invalid email or password." });
+      return res.status(401).json({ message: " Invalid email or password." });
     }
 
     // ✅ Compare password (stored as Bytes, need to convert to string)
@@ -28,7 +28,7 @@ export const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, hashedPassword);
 
     if (!isMatch) {
-      return res.status(401).json({ message: "❌ Invalid email or password." });
+      return res.status(401).json({ message: " Invalid email or password." });
     }
 
     // ✅ Generate JWT Token
@@ -37,6 +37,14 @@ export const loginUser = async (req, res) => {
       JWT_SECRET,
       { expiresIn: "7d" }
     );
+
+    res.cookie("Auth_Token", token, {
+      httpOnly: true, // Prevent access from JavaScript
+      secure: process.env.NODE_ENV === "production", // Only HTTPS in production
+      sameSite: "lax", // CSRF protection (consider 'strict' or 'none' based on needs)
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+      path: "/", // Allow cookie for all routes
+    });
 
     // ✅ Remove sensitive fields from response
     const { password: _, ...safeUser } = user;
@@ -48,6 +56,6 @@ export const loginUser = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Login error:", error);
-    res.status(500).json({ message: "❌ Internal server error" });
+    res.status(500).json({ message: " Internal server error" });
   }
 };
