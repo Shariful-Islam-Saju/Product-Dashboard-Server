@@ -1,8 +1,10 @@
 import prisma from "../../config/db.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || "your_default_secret"; // Replace in .env
+const JWT_SECRET = process.env.JWT_SECRET; // Replace in .env
 
 export const loginUser = async (req, res) => {
   try {
@@ -11,7 +13,7 @@ export const loginUser = async (req, res) => {
     if (!email || !password) {
       return res
         .status(400)
-        .json({ message: "❌ Email and password are required." });
+        .json({ message: " Email and password are required." });
     }
 
     // ✅ Find user by email
@@ -51,7 +53,6 @@ export const loginUser = async (req, res) => {
 
     res.status(200).json({
       message: "✅ User logged in successfully!",
-      token,
       user: safeUser,
     });
   } catch (error) {

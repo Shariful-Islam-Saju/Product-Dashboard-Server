@@ -1,9 +1,11 @@
-import prisma from "../config/db.js";
+import prisma from "../../config/db.js";
 
 export const getAllSalesProducts = async (req, res, next) => {
   try {
-    const products = await prisma.db_salesitems.findMany();
-
+    const products = await prisma.db_salesitems.findMany({
+      take: 2,
+    
+    });
     res.status(200).json({
       message: "✅ Product fetched successfully!",
       products,

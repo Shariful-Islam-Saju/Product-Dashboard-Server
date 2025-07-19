@@ -31,7 +31,7 @@ app.use((req, res) => {
 
 // Global Error Handler (optional)
 app.use((err, req, res, next) => {
-  console.error("❌ Server Error:", err);
+  console.error(" Server Error:", err);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
