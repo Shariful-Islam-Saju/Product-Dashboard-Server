@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 // Route imports
 import productRouter from "./routes/product-dashboard.js";
 import authRouter from "./routes/auth.js";
+import { verifyJwt } from "./utils/verify-jwt.js";
 
 const app = express();
 
@@ -33,6 +34,10 @@ app.get("/", (req, res) => {
 
 // Auth routes
 app.use("/api/auth", authRouter);
+
+// Verify JWT
+
+app.get('/api/verify-jwt', verifyJwt)
 
 // Product dashboard routes (should be protected with auth middleware)
 app.use("/api/product-dashboard", productRouter);
