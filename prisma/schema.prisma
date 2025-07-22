@@ -1083,32 +1083,6 @@ model db_salesitems {
   @@index([store_id], map: "store_id")
 }
 
-model db_salesitemsreturn {
-  id              Int             @id @default(autoincrement())
-  store_id        Int?
-  sales_id        Int?
-  return_id       Int?
-  return_status   String?         @db.VarChar(50)
-  item_id         Int?
-  return_qty      Float?
-  price_per_unit  Float?
-  tax_type        String?         @db.VarChar(50)
-  tax_id          Int?
-  tax_amt         Float?
-  discount_input  Float?
-  discount_amt    Float?
-  discount_type   String?         @db.VarChar(50)
-  unit_total_cost Float?
-  total_cost      Float?
-  status          Int?
-  description     String?         @db.Text
-  purchase_price  Float?          @default(0.000)
-  db_store        db_store?       @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_salesitemsreturn_ibfk_1")
-  db_salesreturn  db_salesreturn? @relation(fields: [return_id], references: [id], onDelete: Cascade, map: "db_salesitemsreturn_ibfk_2")
-
-  @@index([return_id], map: "return_id")
-  @@index([store_id], map: "store_id")
-}
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model db_salespayments {
@@ -1143,6 +1117,33 @@ model db_salespayments {
 
   @@index([customer_id], map: "customer_id")
   @@index([sales_id], map: "sales_id")
+  @@index([store_id], map: "store_id")
+}
+
+model db_salesitemsreturn {
+  id              Int             @id @default(autoincrement())
+  store_id        Int?
+  sales_id        Int?
+  return_id       Int?
+  return_status   String?         @db.VarChar(50)
+  item_id         Int?
+  return_qty      Float?
+  price_per_unit  Float?
+  tax_type        String?         @db.VarChar(50)
+  tax_id          Int?
+  tax_amt         Float?
+  discount_input  Float?
+  discount_amt    Float?
+  discount_type   String?         @db.VarChar(50)
+  unit_total_cost Float?
+  total_cost      Float?
+  status          Int?
+  description     String?         @db.Text
+  purchase_price  Float?          @default(0.000)
+  db_store        db_store?       @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "db_salesitemsreturn_ibfk_1")
+  db_salesreturn  db_salesreturn? @relation(fields: [return_id], references: [id], onDelete: Cascade, map: "db_salesitemsreturn_ibfk_2")
+
+  @@index([return_id], map: "return_id")
   @@index([store_id], map: "store_id")
 }
 
