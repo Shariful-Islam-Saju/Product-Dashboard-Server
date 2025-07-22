@@ -94,9 +94,23 @@ export const getAllSalesProducts = async (req, res, next) => {
         item,
       };
     });
+    const mergedData = Object.values(
+      formatted.reduce((acc, curr) => {
+        const id = curr.item_id;
+
+        if (!acc[id]) {
+          acc[id] = { ...curr };
+        } else {
+          acc[id].total_qty += curr.total_qty;
+          acc[id].total_amount += curr.total_amount;
+        }
+
+        return acc;
+      }, {})
+    );
+
     res.status(200).json({
-      message: "✅ All products fetched successfully!",
-      products: formatted,
+      products: mergedData,
     });
   } catch (error) {
     console.error("Error fetching all products:", error);
