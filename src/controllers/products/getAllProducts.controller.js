@@ -45,13 +45,13 @@ export const getAllSalesProducts = async (req, res, next) => {
   // }
 
   try {
+    const { startDate, endDate } = req.query;
+    console.log(startDate, endDate);
     // Fetch all sales products ordered by sales_qty
     const products = await prisma.db_salesitems.findMany({
-      take: 5,
+      take: 10,
     });
-    products.forEach((item) => {
-      console.log(item);
-    });
+
     // Fetch related item info for each product
     const productsWithItemInfo = await Promise.all(
       products.map(async (item) => {
