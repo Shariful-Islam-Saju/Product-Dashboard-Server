@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
 
 import jwt from "jsonwebtoken";
+import prisma from "../config/db.js";
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export const protectedRoute = (req, res, next) => {
+export const protectedRoute = async (req, res, next) => {
   try {
     const token = req.cookies?.Auth_Token;
 
@@ -17,6 +18,21 @@ export const protectedRoute = (req, res, next) => {
 
     // Verify JWT token
     const decoded = jwt.verify(token, JWT_SECRET);
+
+    if (!decoded.userId || !decoded.mobile || !decoded.username) {
+      throw new Error("Invalid or expired token.");
+    }
+    const user = await prisma.db_users.findFirst({
+      where: {
+        username: decoded.username,
+        mobile: decoded.mobile,
+      },
+    });
+
+    if (!user) {
+      throw new Error("Invalid or expired token.");
+    }
+
     // Attach user info to request
     req.user = {
       userId: decoded.userId,
