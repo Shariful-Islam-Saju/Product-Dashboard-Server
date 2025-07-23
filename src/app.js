@@ -44,7 +44,7 @@ app.use("/api/product-dashboard", productRouter);
 
 // Test
 
-app.use("/api/test", test);
+// app.use("/api/test", test);
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });

@@ -6,12 +6,12 @@ import { logoutUser } from "../controllers/auth/logout.controller.js";
 const authRouter = Router();
 
 // 🔐 Registration route
-authRouter.post("/register", registerUser);
+// authRouter.post("/register", registerUser);
 
 // 🔐 Login route
 authRouter.post("/login", loginUser);
 
 // Logout route
-authRouter.get("/logout", logoutUser);
+authRouter.post("/logout", logoutUser);
 
 export default authRouter;
