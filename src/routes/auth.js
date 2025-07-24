@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/auth/register.controller.js ";
 import { loginUser } from "../controllers/auth/login.controller.js";
 import { logoutUser } from "../controllers/auth/logout.controller.js";
 
@@ -14,4 +13,5 @@ authRouter.post("/login", loginUser);
 // Logout route
 authRouter.post("/logout", logoutUser);
 
+// Verify jst
 export default authRouter;
