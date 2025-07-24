@@ -53,15 +53,12 @@ export const loginUser = async (req, res) => {
       path: "/",
     });
 
-    const safeUser = {
-      first_name: user.first_name,
-      last_name: user.last_name,
-      role: role.role_name,
-    };
-
     res.status(200).json({
-      message: "✅ User logged in successfully!",
-      user: safeUser,
+      user: {
+        userId: user.id,
+        role: user.role_id,
+        name: user.first_name,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);

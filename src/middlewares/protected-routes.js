@@ -36,7 +36,8 @@ export const protectedRoute = async (req, res, next) => {
     // Attach user info to request
     req.user = {
       userId: decoded.userId,
-      role: decoded.role,
+      role: user.role_id,
+      name: user.first_name,
     };
 
     next(); // Allow access to the route
