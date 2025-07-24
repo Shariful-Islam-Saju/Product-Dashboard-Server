@@ -5,8 +5,6 @@ import cookieParser from "cookie-parser";
 // Route imports
 import productRouter from "./routes/product-dashboard.js";
 import authRouter from "./routes/auth.js";
-import { verifyJwt } from "./utils/verify-jwt.js";
-import { test } from "./controllers/test.controller.js";
 import { protectedRoute } from "./middlewares/protected-routes.js";
 
 const app = express();
@@ -33,19 +31,15 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "✅ Product Dashboard API is running." });
 });
 
+// Verify JWT
+app.get("/api/verify-jwt", protectedRoute);
+
 // Auth routes
 app.use("/api/auth", authRouter);
-
-// Verify JWT
-
-app.get("/api/verify-jwt", protectedRoute);
 
 // Product dashboard routes (should be protected with auth middleware)
 app.use("/api/product-dashboard",protectedRoute, productRouter);
 
-// Test
-
-// app.use("/api/test", test);
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
