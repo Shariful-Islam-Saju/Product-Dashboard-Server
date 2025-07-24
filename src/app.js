@@ -7,6 +7,7 @@ import productRouter from "./routes/product-dashboard.js";
 import authRouter from "./routes/auth.js";
 import { verifyJwt } from "./utils/verify-jwt.js";
 import { test } from "./controllers/test.controller.js";
+import { protectedRoute } from "./middlewares/protected-routes.js";
 
 const app = express();
 
@@ -37,10 +38,10 @@ app.use("/api/auth", authRouter);
 
 // Verify JWT
 
-app.get("/api/verify-jwt", verifyJwt);
+app.get("/api/verify-jwt", protectedRoute);
 
 // Product dashboard routes (should be protected with auth middleware)
-app.use("/api/product-dashboard", productRouter);
+app.use("/api/product-dashboard",protectedRoute, productRouter);
 
 // Test
 
