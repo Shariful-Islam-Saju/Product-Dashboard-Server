@@ -426,8 +426,8 @@ model db_customers {
   db_quotation           db_quotation[]
   db_sales               db_sales[]
   db_salespayments       db_salespayments[]
-  db_salespaymentsreturn db_salespaymentsreturn[]
-  db_shippingaddress     db_shippingaddress[]     @ignore
+  db_salespaymentsreturn db_salespaymentsreturn[] 
+  db_shippingaddress     db_shippingaddress[] @ignore
 
   @@index([store_id], map: "store_id")
 }
@@ -1083,7 +1083,6 @@ model db_salesitems {
   @@index([store_id], map: "store_id")
 }
 
-
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model db_salespayments {
   id                   Int                    @id @default(autoincrement())
@@ -1536,7 +1535,7 @@ model db_store {
   db_salespayments                                                  db_salespayments[]
   db_salespaymentsreturn                                            db_salespaymentsreturn[]
   db_salesreturn                                                    db_salesreturn[]
-  db_shippingaddress                                                db_shippingaddress[]        @ignore
+  db_shippingaddress                                                db_shippingaddress[] @ignore
   db_smsapi                                                         db_smsapi[]
   db_smstemplates                                                   db_smstemplates[]
   db_states                                                         db_states[]
