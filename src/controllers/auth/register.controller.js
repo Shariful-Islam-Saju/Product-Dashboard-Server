@@ -29,6 +29,7 @@ export const registerUser = async (req, res) => {
         .json({ message: "❌ Email, password, and username are required." });
     }
 
+    
     // ✅ Check if email already exists
     const existingUser = await prisma.db_users.findFirst({
       where: { email },
