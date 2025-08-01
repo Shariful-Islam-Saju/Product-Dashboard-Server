@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 export const loginUser = async (req, res) => {
   try {
     const { username, mobile } = req.body;
-
+    console.log(username, mobile);
     if (!username || !mobile) {
       return res
         .status(400)
