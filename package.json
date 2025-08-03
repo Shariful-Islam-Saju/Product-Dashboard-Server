@@ -10,7 +10,6 @@
     "build": "prisma generate",
     "postinstall": "prisma generate",
     "prisma": "prisma",
-    "prisma:dev": "prisma migrate dev",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
     "test": "echo \"No tests yet\""
