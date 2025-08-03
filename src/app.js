@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import axios from "axios";
 
 // Route imports
 import productRouter from "./routes/product-dashboard.js";
