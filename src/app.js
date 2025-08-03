@@ -33,13 +33,22 @@ app.get("/", (req, res) => {
 });
 
 // Verify JWT
-app.get("/api/verify-jwt", protectedRoute , verifyJwt);
+app.get("/api/verify-jwt", protectedRoute, verifyJwt);
 
 // Auth routes
 app.use("/api/auth", authRouter);
 
 // Product dashboard routes (should be protected with auth middleware)
-app.use("/api/product-dashboard",protectedRoute, productRouter);
+app.use("/api/product-dashboard", protectedRoute, productRouter);
+
+// See Render IP
+
+app.get("/my-ip", async (req, res) => {
+  const response = await axios.get("https://api.ipify.org?format=json");
+  res.send(`Public IP: ${response.data.ip}`);
+});
+
+app.listen(3000, () => console.log("Running"));
 
 // 404 Handler
 app.use((req, res) => {
