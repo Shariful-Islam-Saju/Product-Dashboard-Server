@@ -43,14 +43,12 @@ export const loginUser = async (req, res) => {
       JWT_SECRET,
       { expiresIn: "7d" }
     );
-    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("Auth_Token", token, {
       httpOnly: true,
-      secure: isProduction, // ✅ true in production, false in dev
-      sameSite: isProduction ? "none" : "lax", // ✅ "none" for cross-site in prod, "lax" for local dev
+      secure: true, // Only for production
+      sameSite: "none", // Required for cross-origin cookie sharing
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
     res.status(200).json({
       user: {
         userId: user.id,
