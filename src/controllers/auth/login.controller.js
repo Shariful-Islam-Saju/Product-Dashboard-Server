@@ -8,7 +8,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 export const loginUser = async (req, res) => {
   try {
     const { username, mobile } = req.body;
-    console.log(username, mobile);
     if (!username || !mobile) {
       return res
         .status(400)
@@ -45,7 +44,6 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
     const isProduction = process.env.NODE_ENV === "production";
-    console.log(isProduction)
     res.cookie("Auth_Token", token, {
       httpOnly: true,
       secure: isProduction, // ✅ true in production, false in dev
