@@ -51,7 +51,7 @@ export const loginUser = async (req, res) => {
       path: "/", // Cookie is accessible from all routes
     });
 
-    console.log((NODE_ENV = production));
+    console.log(NODE_ENV);
 
     res.status(200).json({
       user: {

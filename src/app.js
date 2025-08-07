@@ -17,7 +17,6 @@ const corsOptions = {
   credentials: true, // allow cookies
 };
 
-console.log(process.env.CLIENT_URI)
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -25,6 +24,8 @@ app.use(cookieParser());
 
 // Log Request
 app.use((req, res, next) => {
+  console.log("This is client uri",  process.env.CLIENT_URI);
+
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
 });
