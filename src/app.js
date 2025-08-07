@@ -24,7 +24,6 @@ app.use(cookieParser());
 
 // Log Request
 app.use((req, res, next) => {
-  console.log("This is client uri",  process.env.CLIENT_URI);
 
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
