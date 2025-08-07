@@ -14,9 +14,10 @@ const app = express();
 // Middleware
 // Middleware
 const corsOptions = {
-  origin: true, // Reflect the request origin in the CORS headers
-  credentials: true, // Allow cookies and credentials
+  origin: process.env.CLIENT_URI, // frontend origin
+  credentials: true, // allow cookies
 };
+
 
 app.use(cors(corsOptions));
 
