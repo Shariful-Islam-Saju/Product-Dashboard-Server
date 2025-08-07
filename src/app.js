@@ -12,13 +12,14 @@ import { verifyJwt } from "./utils/verifyJwt.js";
 const app = express();
 
 // Middleware
+// Middleware
 const corsOptions = {
-  origin: process.env.CLIENT_URI, // frontend origin
-  credentials: true, // allow cookies
+  origin: true, // Reflect the request origin in the CORS headers
+  credentials: true, // Allow cookies and credentials
 };
 
-
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 
