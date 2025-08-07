@@ -17,6 +17,8 @@ const corsOptions = {
   credentials: true, // allow cookies
 };
 
+console.log(process.env.CLIENT_URI)
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());

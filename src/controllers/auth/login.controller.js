@@ -45,10 +45,14 @@ export const loginUser = async (req, res) => {
     );
     res.cookie("Auth_Token", token, {
       httpOnly: true,
-      secure: true, // Only for production
-      sameSite: "none", // Required for cross-origin cookie sharing
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production", // true in production only
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // 'none' for cross-origin in production
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/", // Cookie is accessible from all routes
     });
+
+    console.log((NODE_ENV = production));
+
     res.status(200).json({
       user: {
         userId: user.id,
