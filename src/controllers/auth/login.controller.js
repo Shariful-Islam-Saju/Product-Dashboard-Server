@@ -43,13 +43,13 @@ export const loginUser = async (req, res) => {
       JWT_SECRET,
       { expiresIn: "7d" }
     );
-    res.cookie("Auth_Token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true in production only
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // 'none' for cross-origin in production
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path:"/"
-    });
+res.cookie("Auth_Token", token, {
+  httpOnly: true, // Prevent client-side JS access
+  secure: process.env.NODE_ENV === "production", // Send over HTTPS only in production
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // 'none' only if cross-origin is required
+  maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in 7 days
+  path: "/", // Cookie available site-wide
+});
 
 
     res.status(200).json({
