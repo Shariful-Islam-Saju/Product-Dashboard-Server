@@ -39,7 +39,7 @@ export const protectedRoute = async (req, res, next) => {
       role: user.role_id,
       name: user.first_name,
     };
-
+    console.log(user)
     next(); // Allow access to the route
   } catch (error) {
     console.error(" Auth error:", error);

@@ -12,10 +12,9 @@ import { verifyJwt } from "./utils/verifyJwt.js";
 const app = express();
 
 // Middleware
-// Middleware
 const corsOptions = {
-  origin: process.env.CLIENT_URI, // frontend origin
-  credentials: true, // allow cookies
+  origin: process.env.CLIENT_URI, // Match your Next.js domain
+  credentials: true, // Allow cookies to pass through
 };
 
 
