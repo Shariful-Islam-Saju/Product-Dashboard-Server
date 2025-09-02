@@ -1,10 +1,29 @@
-import dotenv from "dotenv";
+import config from "./app/config/index.js";
 import app from "./app.js";
 
-dotenv.config();
+async function main() {
+  const server = app.listen(config.port, () => {
+    console.log(`Server is running in http://localhost:${config.port}`);
+  });
 
-const PORT = process.env.PORT ;
+  const exitHandler = () => {
+    if (server) {
+      server.close(() => {
+        console.info("Server closed!");
+      });
+    }
+    process.exit(1);
+  };
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server listening on http://localhost:${PORT}`);
-});
+  process.on("uncaughtException", (error) => {
+    console.error(error);
+    exitHandler();
+  });
+
+  process.on("unhandledRejection", (error) => {
+    console.error(error);
+    exitHandler();
+  });
+}
+
+main();

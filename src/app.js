@@ -1,68 +1,39 @@
 import express from "express";
 import cors from "cors";
+import httpStatus from "http-status";
 import cookieParser from "cookie-parser";
-import axios from "axios";
-
-// Route imports
-import productRouter from "./routes/product-dashboard.js";
-import authRouter from "./routes/auth.js";
-import { protectedRoute } from "./middlewares/protected-routes.js";
-import { verifyJwt } from "./utils/verifyJwt.js";
+import globalErrorHandler from "./app/errors/globalErrorHandler.js";
+import router from "./app/routes/index.js";
+import config from "./app/config/index.js";
 
 const app = express();
 
-// Middleware
-const corsOptions = {
-  origin: process.env.CLIENT_URI, // Match your Next.js domain
-  credentials: true, // Allow cookies to pass through
-};
-
-
-app.use(cors(corsOptions));
-
-app.use(express.json());
 app.use(cookieParser());
+app.use(cors({ origin: config.client_uri, credentials: true }));
 
-// Log Request
-app.use((req, res, next) => {
-
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
-
-// Health check route
+// parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "✅ Product Dashboard API is running." });
+  res.send({
+    Message: "Inventory App is running...",
+  });
 });
 
-// Verify JWT
-app.get("/api/verify-jwt", protectedRoute, verifyJwt);
+app.use("/api/v1", router);
 
-// Auth routes
-app.use("/api/auth", authRouter);
+app.use(globalErrorHandler);
 
-// Product dashboard routes (should be protected with auth middleware)
-app.use("/api/product-dashboard", protectedRoute, productRouter);
-
-// See Render IP
-
-app.get("/my-ip", async (req, res) => {
-  const response = await axios.get("https://api.ipify.org?format=json");
-  res.send(`Public IP: ${response.data.ip}`);
-});
-
-app.listen(3000, () => console.log("Running"));
-
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
-
-// Global Error Handler (optional)
-app.use((err, req, res, next) => {
-  console.error(" Server Error:", err);
-  res.status(500).json({ error: "Internal Server Error" });
+app.use((req, res, next) => {
+  res.status(httpStatus.NOT_FOUND).json({
+    success: false,
+    message: "API NOT FOUND!",
+    error: {
+      path: req.originalUrl,
+      message: "Your requested path is not found!",
+    },
+  });
 });
 
 export default app;

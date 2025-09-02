@@ -54,7 +54,7 @@ export const getAllSalesProducts = async (req, res, next) => {
     }
 
     // Optional: Validate date format here
-    const rows = await prisma.$queryRawUnsafe(
+    const rows = await prisma.$queryRaw(
       `
       SELECT
         si.item_id,
