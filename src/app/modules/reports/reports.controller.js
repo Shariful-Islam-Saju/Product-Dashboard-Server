@@ -1,19 +1,19 @@
 import catchAsync from "../../shared/catchAsync.js";
 import sendResponse from "../../shared/sendResponse.js";
 import httpStatus from "http-status";
+import { reportsService } from "./reports.service.js";
 
-const getAllSalesProducts = catchAsync(async (req, res) => {
-  // const result = await authService.login(req);
-  const result = { products: [] };
+const salesReport = catchAsync(async (req, res) => {
+  const result = await reportsService.salesReport(req);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Sales Product ",
+    message: "Sales report retrieved successfully.",
     data: result,
   });
 });
 
-
 export const reportsController = {
-  getAllSalesProducts
-}
+  salesReport,
+};
