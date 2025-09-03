@@ -3,7 +3,7 @@ import {
   PrismaClientValidationError,
 } from "@prisma/client/runtime/library.js";
 import httpStatus from "http-status";
-import ApiError from "../errors/ApiError.js"; // adjust path if needed
+import AppError from "../errors/AppError.js";
 
 const globalErrorHandler = (err, req, res, next) => {
   console.error(err);
@@ -29,8 +29,8 @@ const globalErrorHandler = (err, req, res, next) => {
     }
   }
 
-  // Handle custom ApiError
-  else if (err instanceof ApiError) {
+  // Handle custom AppError
+  else if (err instanceof AppError) {
     statusCode = err.statusCode || httpStatus.BAD_REQUEST;
     message = err.message;
     error = err.details || err.message;

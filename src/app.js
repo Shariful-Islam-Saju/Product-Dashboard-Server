@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
-import httpStatus from "http-status";
 import cookieParser from "cookie-parser";
-import globalErrorHandler from "./app/errors/globalErrorHandler.js";
+import globalErrorHandler from "./app/middlewares/globalErrorHandler.js";
 import router from "./app/routes/index.js";
 import config from "./app/config/index.js";
+import notFound from "./app/middlewares/notFound.js";
 
 const app = express();
 
@@ -25,15 +25,6 @@ app.use("/api/v1", router);
 
 app.use(globalErrorHandler);
 
-app.use((req, res, next) => {
-  res.status(httpStatus.NOT_FOUND).json({
-    success: false,
-    message: "API NOT FOUND!",
-    error: {
-      path: req.originalUrl,
-      message: "Your requested path is not found!",
-    },
-  });
-});
+app.use(notFound);
 
 export default app;

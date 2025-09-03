@@ -8,3 +8,4 @@ router.get("/refresh-token", authController.refreshToken);
 router.post("/logout", authController.logout);
 
 export const authRouter = router;
+
