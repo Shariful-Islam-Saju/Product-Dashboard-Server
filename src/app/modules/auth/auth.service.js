@@ -17,15 +17,15 @@ const login = async (req, res) => {
   // Find user
   const user = await prisma.db_users.findFirst({
     where: { username, mobile },
-    select:{
+    select: {
       id: true,
       username: true,
       first_name: true,
       last_name: true,
       mobile: true,
       email: true,
-      profile_picture: true
-    }
+      profile_picture: true,
+    },
   });
 
   if (!user) {
@@ -35,10 +35,15 @@ const login = async (req, res) => {
   // Generate refresh token
 
   const jwtPayload = {
-    id: user.id,
-    username: user.username,
-    mobile: user.mobile,
+   ...user
   };
+
+  // 4️⃣ Generate new access token
+  const accessToken = jwtHelpers.generateToken(
+    jwtPayload,
+    config.jwt.access_token_secret,
+    Number(config.jwt.access_token_expires_in)
+  );
 
   const refreshToken = jwtHelpers.generateToken(
     jwtPayload,
@@ -46,7 +51,7 @@ const login = async (req, res) => {
     Number(config.jwt.refresh_token_expires_in)
   );
   // Return only refresh token
-  return { refreshToken, user };
+  return { refreshToken, accessToken, user };
 };
 
 const refreshToken = async (token) => {
@@ -65,6 +70,15 @@ const refreshToken = async (token) => {
   // 2️⃣ Check if user still exists
   const user = await prisma.db_users.findUnique({
     where: { id: Number(decodedData.id) },
+    select: {
+      id: true,
+      username: true,
+      first_name: true,
+      last_name: true,
+      mobile: true,
+      email: true,
+      profile_picture: true,
+    },
   });
 
   if (!user) {

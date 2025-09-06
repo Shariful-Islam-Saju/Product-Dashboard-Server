@@ -4,7 +4,6 @@ import httpStatus from "http-status";
 
 const salesReport = async (req) => {
   const { startDate, endDate } = req.query;
-
   // 1️⃣ Validate query params
   if (!startDate || !endDate) {
     throw new AppError(
@@ -72,7 +71,6 @@ const salesReport = async (req) => {
       return acc;
     }, {})
   );
-
   return mergedData;
 };
 

@@ -6,38 +6,45 @@ import config from "../../config/index.js";
 
 const login = catchAsync(async (req, res) => {
   const result = await authService.login(req);
-  const { refreshToken, ...other } = result;
+  const { refreshToken, accessToken, ...other } = result;
 
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true, // inaccessible from JavaScript
+    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site in prod, lax in dev
+    maxAge: Number(config.jwt.access_token_expires_in) * 1000, // 5 min
+    path: "/",
+  });
   res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // only HTTPS in prod
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // or "none" if your client is on a different domain
-    maxAge: Number(config.jwt.refresh_token_expires_in) * 1000,
-    path: "/api/v1/auth/refresh-token", // refresh token only sent here
+    httpOnly: true, // inaccessible from JavaScript
+    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site in prod, lax in dev
+    maxAge: Number(config.jwt.refresh_token_expires_in) * 1000, // convert seconds to ms
+    path: "/", // refresh token only sent here
   });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "User logged in successfully!",
-    data: other,
+    data: { ...other, accessToken },
   });
 });
 
 const logout = catchAsync(async (req, res) => {
   // Clear refresh token cookie
   res.clearCookie("refreshToken", {
-    httpOnly: true, // JS cannot access
-    secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-    path: "/api/v1/auth/refresh-token", // clear for all paths
+    httpOnly: true, // inaccessible from JavaScript
+    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site in prod, lax in dev
+    path: "/", // clear for all paths
   });
 
   // Clear access token cookie
   res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    httpOnly: true, // inaccessible from JavaScript
+    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site in prod, lax in dev
     path: "/", // clear for all paths
   });
 
@@ -58,9 +65,9 @@ const refreshToken = catchAsync(async (req, res) => {
   const { accessToken } = result;
 
   res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // only HTTPS in prod
-    sameSite: "strict",
+    httpOnly: true, // inaccessible from JavaScript
+    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site in prod, lax in dev
     maxAge: Number(config.jwt.access_token_expires_in) * 1000, // 5 min
     path: "/",
   });
