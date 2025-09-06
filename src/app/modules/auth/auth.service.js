@@ -17,6 +17,15 @@ const login = async (req, res) => {
   // Find user
   const user = await prisma.db_users.findFirst({
     where: { username, mobile },
+    select:{
+      id: true,
+      username: true,
+      first_name: true,
+      last_name: true,
+      mobile: true,
+      email: true,
+      profile_picture: true
+    }
   });
 
   if (!user) {
@@ -37,7 +46,7 @@ const login = async (req, res) => {
     Number(config.jwt.refresh_token_expires_in)
   );
   // Return only refresh token
-  return { refreshToken, jwtPayload };
+  return { refreshToken, user };
 };
 
 const refreshToken = async (token) => {
