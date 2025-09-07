@@ -2,7 +2,7 @@ import AppError from "../../errors/AppError.js";
 import prisma from "../../shared/prisma.js";
 import httpStatus from "http-status";
 
-const salesReport = async (req) => {
+const allProductsSalesReport = async (req) => {
   const { startDate, endDate } = req.query;
   // 1️⃣ Validate query params
   if (!startDate || !endDate) {
@@ -74,6 +74,40 @@ const salesReport = async (req) => {
   return mergedData;
 };
 
+const getAllProducts = async (req) => {
+  const allProducts = await prisma.db_items.findMany();
+  return allProducts;
+};
+
+const getProductSalesReportByID = async (req) => {
+  const productId = req.params.id;
+  const { startDate, endDate } = req.query; // ✅ get dates from query
+  if (!startDate || !endDate) {
+   throw new AppError(
+     httpStatus.BAD_REQUEST,
+     "Both 'startDate' and 'endDate' query parameters are required."
+   );
+  }
+
+  const result = await prisma.$queryRaw`
+      SELECT
+        DATE(s.sales_date) AS date,
+        SUM(si.sales_qty) AS totalQty,
+        SUM(si.total_cost) AS totalAmount
+      FROM db_salesitems si
+      JOIN db_sales s ON s.id = si.sales_id
+      WHERE si.item_id = ${productId}
+        AND s.sales_date BETWEEN ${new Date(startDate)} AND ${new Date(endDate)}
+      GROUP BY DATE(s.sales_date)
+      ORDER BY date ASC;
+    `;
+
+
+  return result;
+};
+
 export const reportsService = {
-  salesReport,
+  allProductsSalesReport,
+  getAllProducts,
+  getProductSalesReportByID,
 };
