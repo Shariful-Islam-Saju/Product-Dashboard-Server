@@ -8,7 +8,6 @@ const auth = () => {
   return async (req, res, next) => {
     try {
       const authHeader = req.headers.authorization;
-
       // 1️⃣ Check if header exists
       if (!authHeader) {
         throw new AppError(
@@ -30,7 +29,6 @@ const auth = () => {
       if (!token) {
         throw new AppError(httpStatus.UNAUTHORIZED, "Token is missing.");
       }
-
       // 4️⃣ Verify token
       const decoded = jwt.verify(token, config.jwt.access_token_secret);
 
