@@ -1,4 +1,4 @@
-import config from "../../config/index.js";
+// import config from "../../config/index.js";
 import AppError from "../../errors/AppError.js";
 import jwtHelpers from "../../helpers/jwtHelpers.js";
 import prisma from "../../shared/prisma.js";
@@ -32,18 +32,17 @@ const login = async (req, res) => {
     throw new AppError(httpStatus.UNAUTHORIZED, "Invalid username or mobile.");
   }
 
-
   // 4️⃣ Generate new access token
   const accessToken = jwtHelpers.generateToken(
     user,
-    config.jwt.access_token_secret,
-    Number(config.jwt.access_token_expires_in)
+    process.env.ACCESS_TOKEN_SECRET,
+    Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
   );
 
   const refreshToken = jwtHelpers.generateToken(
     user,
-    config.jwt.refresh_token_secret,
-    Number(config.jwt.refresh_token_expires_in)
+    process.env.REFRESH_TOKEN_SECRET,
+    Number(process.env.REFRESH_TOKEN_EXPIRES_IN)
   );
   // Return only refresh token
   return { refreshToken, accessToken, user };
@@ -55,7 +54,7 @@ const refreshToken = async (token) => {
     // 1️⃣ Verify the refresh token
     decodedData = jwtHelpers.verifyToken(
       token,
-      config.jwt.refresh_token_secret
+      process.env.REFRESH_TOKEN_SECRET
     );
   } catch (err) {
     // 401 Unauthorized: token invalid or expired
@@ -81,12 +80,11 @@ const refreshToken = async (token) => {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
-
   // 4️⃣ Generate new access token
   const accessToken = jwtHelpers.generateToken(
     user,
-    config.jwt.access_token_secret,
-    Number(config.jwt.access_token_expires_in)
+    process.env.ACCESS_TOKEN_SECRET,
+    Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
   );
 
   // 5️⃣ Return new access token
@@ -94,7 +92,6 @@ const refreshToken = async (token) => {
     accessToken,
   };
 };
-
 
 export const authService = {
   login,

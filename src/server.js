@@ -29,12 +29,12 @@
 // main();
 
 import app from "./app.js";
-import config from "./app/config/index.js";
+// import config from "./app/config/index.js";
 
 
 
-if (config.env !== "production" && !process.env.PASSENGER) {
-  app.listen(config.port, () => {
-    console.log(`🚀 Server listening on http://localhost:${config.port}`);
+if (process.env.NODE_ENV !== "production" && !process.env.PASSENGER) {
+  app.listen(process.env.PORT, () => {
+    console.log(`🚀 Server listening on http://localhost:${process.env.PORT}`);
   });
 }

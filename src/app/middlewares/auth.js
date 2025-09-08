@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import httpStatus from "http-status";
 import prisma from "../shared/prisma.js"; // your prisma instance
 import AppError from "../errors/AppError.js";
-import config from "../config/index.js";
+// import config from "../config/index.js";
 
 const auth = () => {
   return async (req, res, next) => {
@@ -30,7 +30,7 @@ const auth = () => {
         throw new AppError(httpStatus.UNAUTHORIZED, "Token is missing.");
       }
       // 4️⃣ Verify token
-      const decoded = jwt.verify(token, config.jwt.access_token_secret);
+      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
       const { id, iat } = decoded;
 

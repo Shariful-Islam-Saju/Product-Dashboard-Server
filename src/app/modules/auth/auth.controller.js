@@ -2,7 +2,7 @@ import catchAsync from "../../shared/catchAsync.js";
 import sendResponse from "../../shared/sendResponse.js";
 import httpStatus from "http-status";
 import { authService } from "./auth.service.js";
-import config from "../../config/index.js";
+// import config from "../../config/index.js";
 
 const login = catchAsync(async (req, res) => {
   const result = await authService.login(req);
@@ -12,14 +12,14 @@ const login = catchAsync(async (req, res) => {
     httpOnly: true, // inaccessible from JavaScript
     secure: process.env.NODE_ENV === "production", // HTTPS only in production
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site in prod, lax in dev
-    maxAge: Number(config.jwt.access_token_expires_in) * 1000, // 5 min
+    maxAge: Number(process.env.ACCESS_TOKEN_EXPIRES_IN) * 1000, // 5 min
     path: "/",
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true, // inaccessible from JavaScript
     secure: process.env.NODE_ENV === "production", // HTTPS only in production
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site in prod, lax in dev
-    maxAge: Number(config.jwt.refresh_token_expires_in) * 1000, // convert seconds to ms
+    maxAge: Number(process.env.REFRESH_TOKEN_EXPIRES_IN) * 1000, // 5 min
     path: "/", // refresh token only sent here
   });
 
@@ -68,7 +68,7 @@ const refreshToken = catchAsync(async (req, res) => {
     httpOnly: true, // inaccessible from JavaScript
     secure: process.env.NODE_ENV === "production", // HTTPS only in production
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site in prod, lax in dev
-    maxAge: Number(config.jwt.access_token_expires_in) * 1000, // 5 min
+    maxAge: Number(process.env.ACCESS_TOKEN_EXPIRES_IN) * 1000, // 5 min
     path: "/",
   });
 

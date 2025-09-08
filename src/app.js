@@ -3,16 +3,16 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler.js";
 import router from "./app/routes/index.js";
-import config from "./app/config/index.js";
+// import config from "./app/config/index.js";
 import notFound from "./app/middlewares/notFound.js";
 
 const app = express();
 
 app.use(cookieParser());
-// app.use(cors({ origin: config.client_uri, credentials: true }));
 
 const allowedOrigins = [
   "https://report.unipharma.store",
+  "https://product-dashboard-kappa-five.vercel.app",
   "http://localhost:3000",
   "http://localhost:3001",
 ];
