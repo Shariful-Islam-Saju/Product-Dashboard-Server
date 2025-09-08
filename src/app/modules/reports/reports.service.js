@@ -11,9 +11,9 @@ const allProductsSalesReport = async (req) => {
       "Both 'startDate' and 'endDate' query parameters are required."
     );
   }
-
+  let rows;
   // 2️⃣ Fetch raw data with Prisma (tagged template)
-  const rows = await prisma.$queryRaw`
+  rows = await prisma.$queryRaw`
     SELECT
       si.item_id,
       DATE(s.sales_date) AS sales_date,
@@ -29,12 +29,12 @@ const allProductsSalesReport = async (req) => {
   `;
 
   // 3️⃣ Handle empty result
-  if (!rows || rows.length === 0) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      `No sales data found between ${startDate} and ${endDate}.`
-    );
-  }
+  // if (!rows || rows.length === 0) {
+  //   throw new AppError(
+  //     httpStatus.NOT_FOUND,
+  //     `No sales data found between ${startDate} and ${endDate}.`
+  //   );
+  // }
 
   // 4️⃣ Format each row
   const formatted = rows.map((row) => {
@@ -83,10 +83,10 @@ const getProductSalesReportByID = async (req) => {
   const productId = req.params.id;
   const { startDate, endDate } = req.query; // ✅ get dates from query
   if (!startDate || !endDate) {
-   throw new AppError(
-     httpStatus.BAD_REQUEST,
-     "Both 'startDate' and 'endDate' query parameters are required."
-   );
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Both 'startDate' and 'endDate' query parameters are required."
+    );
   }
 
   const result = await prisma.$queryRaw`
@@ -101,7 +101,6 @@ const getProductSalesReportByID = async (req) => {
       GROUP BY DATE(s.sales_date)
       ORDER BY date ASC;
     `;
-
 
   return result;
 };
