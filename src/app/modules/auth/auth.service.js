@@ -32,21 +32,16 @@ const login = async (req, res) => {
     throw new AppError(httpStatus.UNAUTHORIZED, "Invalid username or mobile.");
   }
 
-  // Generate refresh token
-
-  const jwtPayload = {
-   ...user
-  };
 
   // 4️⃣ Generate new access token
   const accessToken = jwtHelpers.generateToken(
-    jwtPayload,
+    user,
     config.jwt.access_token_secret,
     Number(config.jwt.access_token_expires_in)
   );
 
   const refreshToken = jwtHelpers.generateToken(
-    jwtPayload,
+    user,
     config.jwt.refresh_token_secret,
     Number(config.jwt.refresh_token_expires_in)
   );
@@ -86,16 +81,10 @@ const refreshToken = async (token) => {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
-  // 3️⃣ JWT payload
-  const jwtPayload = {
-    id: user.id,
-    username: user.username,
-    mobile: user.mobile,
-  };
 
   // 4️⃣ Generate new access token
   const accessToken = jwtHelpers.generateToken(
-    jwtPayload,
+    user,
     config.jwt.access_token_secret,
     Number(config.jwt.access_token_expires_in)
   );
