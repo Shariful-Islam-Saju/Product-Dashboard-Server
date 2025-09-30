@@ -12,7 +12,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   "https://report.unipharma.store",
-  "https://product-dashboard-kappa-five.vercel.app",
+  "http://31.97.205.224:3001",
   "http://localhost:3000",
   "http://localhost:3001",
 ];
