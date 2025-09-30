@@ -36,7 +36,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/v1", (req, res) => {
+app.get("/", (req, res) => {
   res.send({
     Message: "Inventory App is running...",
   });

@@ -31,8 +31,6 @@ main();
 // import app from "./app.js";
 // // import config from "./app/config/index.js";
 
-
-
 // if (process.env.NODE_ENV !== "production" && !process.env.PASSENGER) {
 //   app.listen(process.env.PORT, () => {
 //     console.log(`🚀 Server listening on http://localhost:${process.env.PORT}`);
