@@ -2,13 +2,14 @@ import { Router } from "express";
 // import { userRouter } from "../modules/user/user.route.js";
 import { authRouter } from "../modules/auth/auth.route.js";
 import { reportsRouter } from "../modules/reports/reports.route.js";
-
+import { salesRouter } from "../modules/sales/sales.route.js";
 const router = Router();
 
 const moduleRoutes = [
   // { path: "/user", route: userRouter },
   { path: "/auth", route: authRouter },
   { path: "/reports", route: reportsRouter },
+  { path: "/sales", route: salesRouter },
 ];
 
 moduleRoutes.forEach(({ path, route }) => router.use(path, route));
