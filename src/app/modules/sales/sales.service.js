@@ -62,7 +62,7 @@ import httpStatus from "http-status";
 // };
 
 const allSalesReport = async (req) => {
-  const { startDate, endDate } = req.query;
+  const { startDate, endDate, page = "1", limit = "50" } = req.query;
 
   // 1️⃣ Validate query params
   if (!startDate || !endDate) {
@@ -72,15 +72,49 @@ const allSalesReport = async (req) => {
     );
   }
 
+  const pageNumber = parseInt(page, 10);
+  const pageSize = parseInt(limit, 10);
+  const offset = (pageNumber - 1) * pageSize;
+
+  // 2️⃣ Get total count for pagination
+  const totalCountResult = await prisma.$queryRaw`
+    SELECT COUNT(*) as count
+    FROM db_sales
+    WHERE sales_date BETWEEN ${new Date(startDate)} AND ${new Date(endDate)};
+  `;
+  const totalCount = Number(totalCountResult[0]?.count) || 0;
+
+  // 3️⃣ Fetch paginated sales (exclude BigInt/Decimal columns)
   const sales = await prisma.$queryRaw`
-    SELECT *
+    SELECT
+      id,
+      sales_date,
+      subtotal,
+      tot_discount_to_all_amt,
+      grand_total,
+      paid_amount,
+      sales_status,
+      customer_id,
+      store_id,
+      warehouse_id
     FROM db_sales
     WHERE sales_date BETWEEN ${new Date(startDate)} AND ${new Date(endDate)}
-    ORDER BY sales_date ASC;
+    ORDER BY sales_date ASC
+    LIMIT ${pageSize} OFFSET ${offset};
   `;
 
-  return sales;
+  // 4️⃣ Return structured result
+  return {
+    data: sales,
+    pagination: {
+      total: totalCount,
+      page: pageNumber,
+      limit: pageSize,
+      totalPages: Math.ceil(totalCount / pageSize),
+    },
+  };
 };
+
 
 const getAllSalesItems = async (req) => {
   const allItems = await prisma.db_items.findMany();
