@@ -62,28 +62,44 @@ import httpStatus from "http-status";
 // };
 
 const allSalesReport = async (req) => {
-  const { startDate, endDate, page = "1", limit = "5" } = req.query;
+  const { startDate, endDate, search, page = "1", limit = "5" } = req.query;
 
   const pageNumber = parseInt(page, 10);
   const pageSize = parseInt(limit, 10);
   const offset = (pageNumber - 1) * pageSize;
 
-  // 1️⃣ Build dynamic WHERE conditions
-  let whereClause = `1=1`; // always true, so easy to append conditions
+  let whereClause = `1=1`;
   const params = [];
 
+  // Date filters
   if (startDate && endDate) {
-    whereClause = `s.sales_date BETWEEN ${`?`} AND ${`?`}`;
+    whereClause += ` AND s.sales_date BETWEEN ? AND ?`;
     params.push(new Date(startDate), new Date(endDate));
   } else if (startDate) {
-    whereClause = `s.sales_date >= ${`?`}`;
+    whereClause += ` AND s.sales_date >= ?`;
     params.push(new Date(startDate));
   } else if (endDate) {
-    whereClause = `s.sales_date <= ${`?`}`;
+    whereClause += ` AND s.sales_date <= ?`;
     params.push(new Date(endDate));
   }
 
-  // 2️⃣ Get total count
+  // Search filter on sales_code
+  let orderByClause = ``;
+  if (search && search.trim()) {
+    whereClause += ` AND s.sales_code LIKE ?`;
+    params.push(`%${search.trim()}%`);
+
+    // Add sorting to prioritize exact matches
+    orderByClause = `
+      CASE
+        WHEN s.sales_code = ? THEN 1
+        WHEN s.sales_code LIKE ? THEN 2
+        ELSE 3
+      END ASC,
+    `;
+  }
+
+  // Total count query
   const totalCountResult = await prisma.$queryRawUnsafe(
     `SELECT COUNT(*) as count
      FROM db_sales s
@@ -92,29 +108,40 @@ const allSalesReport = async (req) => {
   );
   const totalCount = Number(totalCountResult[0]?.count) || 0;
 
-  // 3️⃣ Get paginated data
+  // Prepare params for main query (includes search term for CASE statement)
+  const mainQueryParams = [...params];
+  if (search && search.trim()) {
+    mainQueryParams.push(search.trim()); // Exact match
+    mainQueryParams.push(`${search.trim()}%`); // Starts with
+  }
+
+  // Fetch paginated data with smart sorting
   const sales = await prisma.$queryRawUnsafe(
     `SELECT
         s.id,
         s.sales_code,
         s.reference_no,
         s.customer_id,
-        c.customer_name,   -- ✅ only customer_name
+        c.customer_name,
         s.payment_status,
         s.paid_amount,
         s.created_date,
-        s.created_time
+        s.created_time,
+        s.sales_date
       FROM db_sales s
       LEFT JOIN db_customers c ON s.customer_id = c.id
       WHERE ${whereClause}
-      ORDER BY s.sales_date ASC
+      ORDER BY
+        ${orderByClause}
+        s.sales_date DESC,
+        s.created_date DESC,
+        s.id DESC
       LIMIT ? OFFSET ?;`,
-    ...params,
+    ...mainQueryParams,
     pageSize,
     offset
   );
 
-  // 4️⃣ Return structured result
   return {
     data: sales,
     pagination: {
@@ -125,6 +152,7 @@ const allSalesReport = async (req) => {
     },
   };
 };
+
 
 
 const getAllSalesItems = async (req) => {
