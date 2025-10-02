@@ -62,46 +62,57 @@ import httpStatus from "http-status";
 // };
 
 const allSalesReport = async (req) => {
-  const { startDate, endDate, page = "1", limit = "50" } = req.query;
-
-  // 1️⃣ Validate query params
-  if (!startDate || !endDate) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Both 'startDate' and 'endDate' query parameters are required."
-    );
-  }
+  const { startDate, endDate, page = "1", limit = "5" } = req.query;
 
   const pageNumber = parseInt(page, 10);
   const pageSize = parseInt(limit, 10);
   const offset = (pageNumber - 1) * pageSize;
 
-  // 2️⃣ Get total count for pagination
-  const totalCountResult = await prisma.$queryRaw`
-    SELECT COUNT(*) as count
-    FROM db_sales
-    WHERE sales_date BETWEEN ${new Date(startDate)} AND ${new Date(endDate)};
-  `;
+  // 1️⃣ Build dynamic WHERE conditions
+  let whereClause = `1=1`; // always true, so easy to append conditions
+  const params = [];
+
+  if (startDate && endDate) {
+    whereClause = `s.sales_date BETWEEN ${`?`} AND ${`?`}`;
+    params.push(new Date(startDate), new Date(endDate));
+  } else if (startDate) {
+    whereClause = `s.sales_date >= ${`?`}`;
+    params.push(new Date(startDate));
+  } else if (endDate) {
+    whereClause = `s.sales_date <= ${`?`}`;
+    params.push(new Date(endDate));
+  }
+
+  // 2️⃣ Get total count
+  const totalCountResult = await prisma.$queryRawUnsafe(
+    `SELECT COUNT(*) as count
+     FROM db_sales s
+     WHERE ${whereClause};`,
+    ...params
+  );
   const totalCount = Number(totalCountResult[0]?.count) || 0;
 
-  // 3️⃣ Fetch paginated sales (exclude BigInt/Decimal columns)
-  const sales = await prisma.$queryRaw`
-    SELECT
-      id,
-      sales_date,
-      subtotal,
-      tot_discount_to_all_amt,
-      grand_total,
-      paid_amount,
-      sales_status,
-      customer_id,
-      store_id,
-      warehouse_id
-    FROM db_sales
-    WHERE sales_date BETWEEN ${new Date(startDate)} AND ${new Date(endDate)}
-    ORDER BY sales_date ASC
-    LIMIT ${pageSize} OFFSET ${offset};
-  `;
+  // 3️⃣ Get paginated data
+  const sales = await prisma.$queryRawUnsafe(
+    `SELECT
+        s.id,
+        s.sales_code,
+        s.reference_no,
+        s.customer_id,
+        c.customer_name,   -- ✅ only customer_name
+        s.payment_status,
+        s.paid_amount,
+        s.created_date,
+        s.created_time
+      FROM db_sales s
+      LEFT JOIN db_customers c ON s.customer_id = c.id
+      WHERE ${whereClause}
+      ORDER BY s.sales_date ASC
+      LIMIT ? OFFSET ?;`,
+    ...params,
+    pageSize,
+    offset
+  );
 
   // 4️⃣ Return structured result
   return {
