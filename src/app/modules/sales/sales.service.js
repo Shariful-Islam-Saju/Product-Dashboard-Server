@@ -1,6 +1,5 @@
 import AppError from "../../errors/AppError.js";
 import prisma from "../../shared/prisma.js";
-import httpStatus from "http-status";
 
 // const allSalesReport = async (req) => {
 //   const { startDate, endDate } = req.query;
@@ -158,13 +157,12 @@ const getAllSalesItems = async (req) => {
   return allItems;
 };
 
-
 const getSalesReportByProductID = async (req) => {
   const salesID = Number(req.params.id);
 
   // Validate salesID
   if (!salesID || isNaN(salesID)) {
-    throw new Error("Valid Sales ID is required");
+    throw new AppError("Valid Sales ID is required");
   }
 
   // ✅ Get the single sale with all its details (safe query)
@@ -238,9 +236,8 @@ const getSalesReportByProductID = async (req) => {
   `;
 
   // ⚡️ Safe return: since sales is always an array
-  return  { ...sales[0], items };
+  return { ...sales[0], items };
 };
-
 
 export const salesService = {
   allSalesReport,
