@@ -62,7 +62,7 @@ import httpStatus from "http-status";
 // };
 
 const allSalesReport = async (req) => {
-  const { startDate, endDate, search, page = "1", limit = "5" } = req.query;
+  const { startDate, endDate, search, page = "1", limit = "50" } = req.query;
 
   const pageNumber = parseInt(page, 10);
   const pageSize = parseInt(limit, 10);
@@ -153,38 +153,94 @@ const allSalesReport = async (req) => {
   };
 };
 
-
-
 const getAllSalesItems = async (req) => {
   const allItems = await prisma.db_items.findMany();
   return allItems;
 };
 
+
 const getSalesReportByProductID = async (req) => {
-  const productId = req.params.id;
-  const { startDate, endDate } = req.query; // ✅ get dates from query
-  if (!startDate || !endDate) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Both 'startDate' and 'endDate' query parameters are required."
-    );
+  const salesID = Number(req.params.id);
+
+  // Validate salesID
+  if (!salesID || isNaN(salesID)) {
+    throw new Error("Valid Sales ID is required");
   }
 
-  const result = await prisma.$queryRaw`
+  // ✅ Get the single sale with all its details (safe query)
+  const sales = await prisma.$queryRaw`
     SELECT
-      DATE(s.sales_date) AS date,
-      SUM(si.sales_qty) AS totalQty,
-      SUM(si.total_cost) AS totalAmount
-    FROM db_salesitems si
-    JOIN db_sales s ON s.id = si.sales_id
-    WHERE si.item_id = ${productId}
-      AND s.sales_date BETWEEN ${new Date(startDate)} AND ${new Date(endDate)}
-    GROUP BY DATE(s.sales_date)
-    ORDER BY date ASC;
+      s.id,
+      s.sales_code,
+      -- s.reference_no,
+      s.sales_date,
+      -- s.sales_status,
+      s.payment_status,
+      s.paid_amount,
+      s.subtotal,
+      -- s.invoice_terms,
+      s.created_date,
+      s.created_time,
+      s.created_by,
+
+      -- Customer details
+      c.id AS customer_id,
+      c.customer_name
+      -- c.mobile,
+      -- c.email,
+      -- c.address,
+
+      -- Store + Warehouse
+      -- st.store_name,
+      -- w.warehouse_name
+
+    FROM db_sales s
+    LEFT JOIN db_customers c ON s.customer_id = c.id
+    LEFT JOIN db_store st ON s.store_id = st.id
+    LEFT JOIN db_warehouse w ON s.warehouse_id = w.id
+    WHERE s.id = ${salesID}
+    LIMIT 1;
   `;
 
-  return result;
+  // ✅ Get all items for this sale (safe query)
+  const items = await prisma.$queryRaw`
+    SELECT
+      si.id AS sales_item_id,
+      si.sales_qty,
+      si.price_per_unit,
+      -- si.tax_type,
+      -- si.tax_id,
+      -- si.tax_amt,
+      -- si.discount_type,
+      -- si.discount_input,
+      si.discount_amt,
+      si.unit_total_cost,
+      si.total_cost,
+      -- si.description AS item_description,
+
+      -- Item details
+      i.id AS item_id,
+      i.item_code,
+      i.item_name,
+      i.sku
+      -- i.hsn,
+      -- i.sac,
+      -- i.item_image,
+      -- i.unit_id
+
+    FROM db_salesitems si
+    LEFT JOIN db_items i ON si.item_id = i.id
+    LEFT JOIN db_category cat ON i.category_id = cat.id
+    LEFT JOIN db_brands br ON i.brand_id = br.id
+    LEFT JOIN db_units u ON i.unit_id = u.id
+    WHERE si.sales_id = ${salesID}
+    ORDER BY si.id ASC;
+  `;
+
+  // ⚡️ Safe return: since sales is always an array
+  return  { ...sales[0], items };
 };
+
 
 export const salesService = {
   allSalesReport,
